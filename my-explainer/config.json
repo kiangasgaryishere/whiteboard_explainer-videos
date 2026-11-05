@@ -4,7 +4,7 @@
   "height": 1920,
   "fps": 25,
   "captions": true,
-  "pen": false,
+  "pen": true,
   "pan": 0.45,
   "lead": 0.35,
   "gap": 0.22,
@@ -21,7 +21,13 @@
     "paperCenter": "#ffffff",
     "paperEdge": "#f1f0ea"
   },
-  "renderer": "watercolor_motion.py",
+  "renderer": "kinetic_render.py",
   "audio": "source.mp3",
-  "timing_status": "awaiting_verified_alignment"
+  "timing_status": "awaiting_verified_alignment",
+  "visual_beat_seconds": 3.6,
+  "marker_colors": [
+    "charcoal",
+    "blue",
+    "green"
+  ]
 }

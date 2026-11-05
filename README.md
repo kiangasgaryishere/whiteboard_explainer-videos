@@ -16,6 +16,17 @@ A Persian-language English-learning explainer using the supplied narrator record
 
 `my-explainer/` contains the original `source.mp3`, supplied `transcript.md`, approved `brief.md`, scene-grouped `script.json`, generated watercolor assets, previews, and all rendered outputs. Original study-board drawings and legacy renderer files are retained for project history; `watercolor_motion.py` is the current renderer. `voice.json` documents the original recording; it is not a synthesis configuration for the upstream audio generator.
 
+## Visual revision 2
+
+`kinetic_render.py` implements the requested faster visual treatment: 26 beats, a new text/focus event every 3.6 seconds, visible black/blue/green markers, progressive Persian/English text reveal, traced illustration outlines, watercolor fill, and the original narration. The visual edit is controlled by `kinetic_edit.json`. These timings are provisional editorial cues, **not verified subtitle timing**.
+
+```bash
+python3 my-explainer/kinetic_render.py --preview 10.8
+python3 my-explainer/kinetic_render.py
+```
+
+The new output is `my-explainer/out/kinetic-marker-v2.mp4`; the earlier drafts are retained. This revision increases teaching text as requested and supersedes the earlier sparse-text treatment. It does not resolve the outstanding speech-alignment dependency.
+
 ## Setup
 
 Use Python 3.12 and FFmpeg/ffprobe. The renderer uses Debian/Ubuntu fonts from `fonts-noto-core` and `fonts-dejavu-core` (Noto Sans Arabic Bold and DejaVu Sans Bold); install those fonts or update the font paths when using another operating system.
