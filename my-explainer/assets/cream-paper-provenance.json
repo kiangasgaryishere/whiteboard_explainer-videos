@@ -1,0 +1,8 @@
+{
+  "asset": "cream-paper-reference-reconstruction.png",
+  "source": "Most recent user inline cream-paper reference",
+  "method": "OpenAI image generation, reference-guided reconstruction",
+  "exact_original_pixels": false,
+  "reason": "Inline image has no accessible local file or Sediment handle",
+  "use": "Full-frame V10 background, resized to 1080x1920"
+}

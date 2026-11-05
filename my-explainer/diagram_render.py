@@ -3,7 +3,7 @@ No image tracing or raster illustration dissolve. Voice alignment is provisional
 """
 import argparse, math, json, subprocess, bisect
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont, ImageChops
+from PIL import Image, ImageDraw, ImageFont, ImageChops, ImageFilter
 import numpy as np
 import cv2
 from caption_style import normalize, font_path, load_cues, caption, group_cues
@@ -12,13 +12,13 @@ W,H,FPS=1080,1920,25
 INK='#263446'; BLUE='#336cce'; GREEN='#23846e'; GOLD='#dfaa42'; RED='#d7635d'
 FA='/usr/share/fonts/truetype/noto/NotoSansArabic-Bold.ttf'; EN='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 ap=argparse.ArgumentParser();ap.add_argument('--preview',type=float)
-ap.add_argument('--revision',type=int,choices=[3,4,5,6,7,8,9],default=3)
+ap.add_argument('--revision',type=int,choices=[3,4,5,6,7,8,9,10],default=3)
 ap.add_argument('--word-captions',type=Path)
 ap.add_argument('--style-still',type=float)
 ap.add_argument('--sample-word')
 ap.add_argument('--allow-estimated-captions',action='store_true',help='Explicitly render unverified draft word timings; not a synchronization claim')
 ap.add_argument('--art-sheet',action='store_true')
-a=ap.parse_args();v4=a.revision>=4;v5=a.revision>=5;v6=a.revision>=6;v7=a.revision>=7;v8=a.revision>=8;v9=a.revision==9
+a=ap.parse_args();v4=a.revision>=4;v5=a.revision>=5;v6=a.revision>=6;v7=a.revision>=7;v8=a.revision>=8;v9=a.revision>=9;v10=a.revision==10
 headline_font=P/'assets/fonts/Shabnam-Bold.ttf' if v6 else None
 subtitle_font=P/'assets/fonts/Shabnam-Medium.ttf' if v6 else None
 if a.sample_word and a.style_still is None:ap.error('--sample-word is for a still design sample only')
@@ -41,6 +41,7 @@ if a.allow_estimated_captions:print('DRAFT caption timing enabled: not verified 
 rng=np.random.default_rng(47);noise=rng.normal(0,.65,(H,W,1))
 paper=Image.fromarray(np.uint8(np.clip(np.array([253,250,242])[None,None,:]+noise,0,255)))
 if v4:paper=Image.open(P/'assets'/'notebook-paper.png').convert('RGB').resize((W,H),Image.Resampling.LANCZOS)
+if v10:paper=Image.open(P/meta['background']).convert('RGB').resize((W,H),Image.Resampling.LANCZOS)
 marker_count=0
 class Icon:
  def __init__(self,cx,cy,s=1):self.cx=cx;self.cy=cy;self.s=s;self.paths=[];self.regions=[]
@@ -229,6 +230,12 @@ def pen(im,tip,c,approach=None):
   if lower:return(x+(a*.84+b*.53)*.78,y+(-a*.53+b*.84)*.78)
   return(x+a*.84-b*.53,y-a*.53-b*.84)
  def polygon(q,c):d.polygon([pt(a,b) for a,b in q],fill=c)
+ if v10:
+  hull=[pt(a,b) for a,b in [(-12,0),(14,0),(16,166),(-14,166)]]
+  x0=int(min(p[0] for p in hull))-20;y0=int(min(p[1] for p in hull))-20
+  shadow=Image.new('RGBA',(220,230));sd=ImageDraw.Draw(shadow)
+  sd.polygon([(xx-x0+13,yy-y0+13) for xx,yy in hull],fill=(55,43,30,65))
+  shadow=shadow.filter(ImageFilter.GaussianBlur(7));im.paste(shadow,(x0,y0),shadow)
  polygon([(-7,0),(6,0),(10,18),(-9,18)],c)
  polygon([(-9,18),(10,18),(14,40),(-12,40)],'#a7b1ba')
  polygon([(-12,40),(14,40),(14,145),(-12,145)],'#fff0d0' if lower else '#f6f6f1')
@@ -236,6 +243,9 @@ def pen(im,tip,c,approach=None):
  polygon([(-12,128),(14,128),(14,145),(-12,145)],c)
  d.line([pt(-8,42),pt(-8,126)],fill='#b5bec7',width=2)
  if lower:d.line([pt(-11,111),pt(13,111)],fill='#243348',width=3)
+ if v10:
+  d.line([pt(-7,44),pt(-7,140)],fill='#ffffff',width=4)
+  d.line([pt(11,43),pt(11,141)],fill='#979c9a',width=3)
 
 paint_masks={}
 def strokes(im,paths,soft=False,clip=None):
@@ -251,7 +261,8 @@ def strokes(im,paths,soft=False,clip=None):
     for polygon,_ in clip:md.polygon(polygon,fill=255)
     paint_masks[key]=mask
    layer.putalpha(ImageChops.multiply(layer.getchannel('A'),paint_masks[key]))
-  im.paste(layer,(0,0),layer)
+  if im.mode=='RGBA':im.alpha_composite(layer)
+  else:im.paste(layer,(0,0),layer)
  else:
   d=ImageDraw.Draw(im)
   for q,c,w in paths:d.line(q,fill=c,width=w,joint='curve')
@@ -261,6 +272,7 @@ def strokes(im,paths,soft=False,clip=None):
 textcache={}
 for i,(_,title,sub) in enumerate(beats):
  specs=[('title',title,1340 if v7 else 1460,860,72)] if v5 else [('title',title,820+620*(i%2),820,62 if v4 else 45),('label',sub,920+620*(i%2),800,37 if v4 else 35)]
+ if v10:specs.append(('intro',meta['frames'][i]['intro'],270,900,74))
  for key,text,cy,maxwidth,size in specs:
   rtl=any('\u0600'<=ch<='\u06ff' for ch in text)
   while True:
@@ -358,6 +370,7 @@ def build_v5(t):
  return im
 
 def build_v8(t):
+ if v10:return director10.build(t)
  if v9:return build_v9(t)
  global marker_count
  marker_count=0
@@ -487,6 +500,9 @@ def draw_cta(im):
  d.text((540,1467),'ACTIVE',font=en,anchor='mm',fill='#f1c96f')
  f=ImageFont.truetype(str(headline_font),58)
  d.text((540,1562),'را کامنت کن',font=f,anchor='mm',direction='rtl',fill='#ffffff')
+if v10:
+ from direction_v10 import Director
+ director10=Director(globals())
 if a.style_still is not None:
  im=build(a.style_still)
  if a.sample_word:caption(im,a.sample_word,subtitle_font,meta['caption_center_y'] if v7 else 1735)

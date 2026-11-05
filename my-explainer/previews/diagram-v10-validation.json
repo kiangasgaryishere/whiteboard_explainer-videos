@@ -1,0 +1,37 @@
+{
+  "format": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 1080,
+        "height": 1920,
+        "nb_frames": "2347"
+      },
+      {
+        "codec_name": "aac",
+        "sample_rate": "44100",
+        "nb_frames": "4045"
+      }
+    ],
+    "format": {
+      "duration": "93.893696"
+    }
+  },
+  "caption_groups": 89,
+  "transcript_words": 238,
+  "caption_timing": "estimated-unreviewed",
+  "source_correlation_at_half_second_delay": 0.9999651965055614,
+  "markers": {
+    "total_frames": 2348,
+    "count_basis": "rendered frames before mux rounding",
+    "encoded_frames": 2347,
+    "frames_by_visible_marker_count": {
+      "0": 503,
+      "1": 839,
+      "2": 1006
+    }
+  },
+  "note": "Checks verify file integrity and text preservation, not precise semantic or subtitle alignment. Background is an AI reconstruction of the inline reference."
+}

@@ -1,0 +1,8 @@
+{
+  "scenes_checked": 13,
+  "new_artwork_before_intro_completion": false,
+  "keywords_before_picture_completion": false,
+  "exceptions": "Previous restaurant context retained; established CTA present in final scenes.",
+  "english_examples": "Opening headline retained through entire question/answer scene",
+  "scope": "Pixel checks of actual rendered phase boundaries; speech timing unverified."
+}

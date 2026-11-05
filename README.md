@@ -2,7 +2,7 @@
 
 A Persian-language English-learning explainer using the supplied narrator recording, watercolor artwork, and progressive ink-outline reveals. Vertical 1080×1920, 25 fps. No generated voice, music, or added sound effects.
 
-Latest captioned **draft**: [revision 9](my-explainer/out/diagram-v9.mp4) / [ZIP](my-explainer/out/diagram-v9.zip), with richer illustrations, transcript-related contextual insets and a new four-second visual hook. Two concurrent markers, smaller phrase captions, notebook texture and the half-second narration delay remain. Base subtitle timing is **estimated and unverified**, not precise speech alignment.
+Latest captioned **draft**: [revision 10](my-explainer/out/diagram-v10.mp4) / [ZIP](my-explainer/out/diagram-v10.zip). Text-first direction, recurring adult learner, continuing restaurant scene, gentle reframing, shaded opposing markers and a cream paper background reconstructed from the user reference. Base speech/caption timing remains **estimated and unverified**.
 
 ## Watch or download
 
@@ -177,3 +177,21 @@ PYTHONPATH=/workspace/whiteboard-tools python3 my-explainer/diagram_render.py --
 ```
 
 Outputs: `out/diagram-v9.mp4`, `out/diagram-v9.zip`, `previews/diagram-v9-art-sheet.png`, art footprint metrics and per-frame marker counts. Caption text is preserved, but inherited speech timings and semantic cut anchors remain estimated/unreviewed.
+
+## Visual revision 10 — headline, picture, keyword
+
+The newer request supersedes picture-first sequencing. Each new scene writes a short curiosity headline (0–1.05s), draws its new illustrations with two opposing markers (outlines 1.18–4.05s, coloring through 4.92s), then writes the keyword (5.02–6.07s). The final ACTIVE keyword is written inside its speech bubble. Previously drawn restaurant context persists across four teaching scenes; new explanatory marks wait for the opening headline. The existing comment CTA remains above the subtitle band.
+
+`direction_v10.py` directs a recurring learner with the same hair, face and clothing, more adult proportions, and changing thoughtful/confident poses. The waiter is distinguished by glasses, moustache and vest. Restaurant composition remains in place while context, listening, question and answer develop. Camera reframing affects only artwork; headings, CTA and captions stay still. Marker bodies have highlights and soft shadows. Curved line art and transparent color strokes remain authored vectors.
+
+**Background provenance:** the original inline paper image was visible in chat but not exposed as a downloadable file in this workspace. `assets/cream-paper-reference-reconstruction.png` is an AI reconstruction based on that image, not the exact supplied pixels. It replaces the lined notebook background. No new voice, music or sound effects are added.
+
+```sh
+PYTHONPATH=/workspace/whiteboard-tools python3 my-explainer/diagram_render.py --revision 10 \
+  --word-captions my-explainer/word-captions.estimated.json --allow-estimated-captions
+# Add --art-sheet for the scene review sheet, or --preview 14 for the opening.
+```
+
+Review images: `previews/diagram-v10-opening-sequence.jpg` and `diagram-v10-art-sheet.png`. Pixel checks of actual rendered frames confirm that new artwork does not appear before the headline and keywords do not appear before picture completion. The prior restaurant context is intentionally retained. Original narration remains complete with the previously requested 0.5s delay: output duration 93.893696s. Subtitle cues, teaching scene boundaries and semantic J/L anchors are inherited estimates, not newly verified speech alignment.
+
+V10 English examples are written first as the opening headline and remain for their full 6.6s/7s scene windows; the shorter RECOMMEND / USE keyword follows the drawing. This avoids introducing a full teaching sentence only at the end of the scene.
