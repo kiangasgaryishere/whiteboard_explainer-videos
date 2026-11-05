@@ -12,6 +12,11 @@ ARABIC = '/usr/share/fonts/truetype/noto/NotoSansArabic-Bold.ttf'
 LATIN = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
 
 
+@lru_cache(maxsize=128)
+def cached_font(path, size):
+    return ImageFont.truetype(path, size)
+
+
 def normalize(text):
     # Noto Sans Arabic has no U+2026: keep the punctuation using three periods.
     return unicodedata.normalize('NFC', text).replace('\u2026', '...')
@@ -23,19 +28,20 @@ def coverage(path):
         return frozenset(font.getBestCmap())
 
 
-def font_path(text):
+def font_path(text, preferred=None):
     rtl = any('\u0600' <= c <= '\u06ff' for c in text)
     needed = {ord(c) for c in text if not c.isspace() and unicodedata.category(c) != 'Cf'}
-    for path in ([ARABIC, LATIN] if rtl else [LATIN, ARABIC]):
+    candidates = ([str(preferred)] if preferred else []) + ([ARABIC, LATIN] if rtl else [LATIN, ARABIC])
+    for path in candidates:
         if needed <= coverage(path):
             return path
     missing = needed - coverage(LATIN) - coverage(ARABIC)
     raise ValueError(f'Unsupported glyphs: {sorted(hex(c) for c in missing)} in {text!r}')
 
 
-def load_cues(path, audio, duration):
+def load_cues(path, audio, duration, allow_estimated=False):
     data = json.loads(Path(path).read_text())
-    if data.get('reviewed') is not True:
+    if data.get('reviewed') is not True and not (allow_estimated and data.get('timing_status') == 'estimated-draft'):
         raise ValueError('Word timings must be reviewed before rendering.')
     digest = hashlib.sha256(Path(audio).read_bytes()).hexdigest()
     if data.get('source_sha256') != digest:
@@ -55,11 +61,11 @@ def load_cues(path, audio, duration):
     return cues
 
 
-def caption(im, word):
+def caption(im, word, preferred=None):
     word = normalize(word)
     size = 68
     while True:
-        font = ImageFont.truetype(font_path(word), size)
+        font = cached_font(font_path(word, preferred), size)
         if font.getlength(word) <= 740:
             break
         size -= 1

@@ -1,0 +1,171 @@
+{
+  "revision": 6,
+  "layout": "Image-led single continuous composition per frame; one keyword band only",
+  "frames": [
+    {
+      "start": 0,
+      "end": 6.4,
+      "keyword": "لغت جدید",
+      "main": "person",
+      "support": "book",
+      "provisional_audio_reference": 0.0,
+      "visual_offset": 0.0,
+      "planned_bridge": "opening",
+      "timing_status": "editorial reference only; not measured speech alignment"
+    },
+    {
+      "start": 6.4,
+      "end": 14.0,
+      "keyword": "معنی / تعریف / مثال",
+      "main": "dictionary",
+      "support": "notebook",
+      "provisional_audio_reference": 7.2,
+      "visual_offset": -0.8,
+      "planned_bridge": "L-cut / picture leads",
+      "timing_status": "editorial reference only; not measured speech alignment"
+    },
+    {
+      "start": 14.0,
+      "end": 21.7,
+      "keyword": "دانستن ≠ استفاده",
+      "main": "talk",
+      "support": "question",
+      "provisional_audio_reference": 14.4,
+      "visual_offset": -0.4,
+      "planned_bridge": "L-cut / picture leads",
+      "timing_status": "editorial reference only; not measured speech alignment"
+    },
+    {
+      "start": 21.7,
+      "end": 28.5,
+      "keyword": "PASSIVE",
+      "main": "brain",
+      "support": "lock",
+      "provisional_audio_reference": 21.6,
+      "visual_offset": 0.1,
+      "planned_bridge": "J-cut / audio leads",
+      "timing_status": "editorial reference only; not measured speech alignment"
+    },
+    {
+      "start": 28.5,
+      "end": 35.1,
+      "keyword": "ACTIVE",
+      "main": "unlock",
+      "support": "talk",
+      "provisional_audio_reference": 28.8,
+      "visual_offset": -0.3,
+      "planned_bridge": "L-cut / picture leads",
+      "timing_status": "editorial reference only; not measured speech alignment"
+    },
+    {
+      "start": 35.1,
+      "end": 42.7,
+      "keyword": "CONTEXT → LISTEN → USE",
+      "main": "flow",
+      "support": "light",
+      "provisional_audio_reference": 36.0,
+      "visual_offset": -0.9,
+      "planned_bridge": "L-cut / picture leads",
+      "timing_status": "editorial reference only; not measured speech alignment"
+    },
+    {
+      "start": 42.7,
+      "end": 50.3,
+      "keyword": "RECOMMEND",
+      "main": "table",
+      "support": "waiter",
+      "provisional_audio_reference": 43.2,
+      "visual_offset": -0.5,
+      "planned_bridge": "L-cut / picture leads",
+      "timing_status": "editorial reference only; not measured speech alignment"
+    },
+    {
+      "start": 50.3,
+      "end": 57.8,
+      "keyword": "LISTEN",
+      "main": "headphones",
+      "support": "dictionary",
+      "provisional_audio_reference": 50.4,
+      "visual_offset": -0.1,
+      "planned_bridge": "L-cut / picture leads",
+      "timing_status": "editorial reference only; not measured speech alignment"
+    },
+    {
+      "start": 57.8,
+      "end": 64.7,
+      "keyword": "Can you recommend a dish?",
+      "main": "question",
+      "support": "person",
+      "provisional_audio_reference": 57.6,
+      "visual_offset": 0.2,
+      "planned_bridge": "J-cut / audio leads",
+      "timing_status": "editorial reference only; not measured speech alignment"
+    },
+    {
+      "start": 64.7,
+      "end": 71.2,
+      "keyword": "I’d recommend the pasta.",
+      "main": "pasta",
+      "support": "reply",
+      "provisional_audio_reference": 64.8,
+      "visual_offset": -0.1,
+      "planned_bridge": "L-cut / picture leads",
+      "timing_status": "editorial reference only; not measured speech alignment"
+    },
+    {
+      "start": 71.2,
+      "end": 78.8,
+      "keyword": "۱۰ لغت / هفته",
+      "main": "calendar",
+      "support": "cards",
+      "provisional_audio_reference": 72.0,
+      "visual_offset": -0.8,
+      "planned_bridge": "L-cut / picture leads",
+      "timing_status": "editorial reference only; not measured speech alignment"
+    },
+    {
+      "start": 78.8,
+      "end": 86.6,
+      "keyword": "تمرین + اسپیکینگ",
+      "main": "worksheet",
+      "support": "talk",
+      "provisional_audio_reference": 79.2,
+      "visual_offset": -0.4,
+      "planned_bridge": "L-cut / picture leads",
+      "timing_status": "editorial reference only; not measured speech alignment"
+    },
+    {
+      "start": 86.6,
+      "end": 93.393696,
+      "keyword": "ACTIVE",
+      "main": "bubble",
+      "support": "send",
+      "provisional_audio_reference": 86.4,
+      "visual_offset": 0.2,
+      "planned_bridge": "J-cut / audio leads",
+      "timing_status": "editorial reference only; not measured speech alignment"
+    }
+  ],
+  "background": "assets/notebook-paper.png",
+  "marker_policy": "one visible marker; complete drawing, marker color, then keyword",
+  "phase_seconds": {
+    "main_outline": 1.8,
+    "main_color": 0.65,
+    "connector": 0.2,
+    "support_outline": 1.15,
+    "support_color": 0.55,
+    "keyword": 0.9
+  },
+  "caption_status": "Full supplied transcript as one-word subtitles; estimated-draft timings, NOT verified synchronization",
+  "synchronization": "J/L edit points are planned against provisional audio references, not verified semantic boundaries",
+  "audio": "Original recording unchanged, no silence or effects added",
+  "font": {
+    "headline": "assets/fonts/Shabnam-Bold.ttf",
+    "subtitle": "assets/fonts/Shabnam-Medium.ttf"
+  },
+  "cta": {
+    "start": 83.73,
+    "instruction": "کلمهٔ ACTIVE را کامنت کن",
+    "timing_status": "Provisional line anchor, not verified ASR"
+  }
+}

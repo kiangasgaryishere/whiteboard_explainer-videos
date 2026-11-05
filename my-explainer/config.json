@@ -21,7 +21,7 @@
     "paperCenter": "#ffffff",
     "paperEdge": "#f1f0ea"
   },
-  "renderer": "diagram_render.py --revision 5",
+  "renderer": "diagram_render.py --revision 6 --word-captions word-captions.estimated.json --allow-estimated-captions",
   "audio": "source.mp3",
   "timing_status": "awaiting_verified_alignment",
   "visual_beat_seconds": "variable 6.4–7.8 second frames",
@@ -33,6 +33,9 @@
   "background": "assets/notebook-paper.png",
   "single_marker": true,
   "headline_size": 62,
-  "word_captions_status": "Style implemented; verified timestamps unavailable; not burned into visual revision",
-  "text_policy": "one keyword band per frame; essential English examples retained"
+  "word_captions_status": "Complete transcript displayed with estimated, unverified timing; draft only",
+  "text_policy": "one keyword band per frame; essential English examples retained",
+  "persian_headline_font": "assets/fonts/Shabnam-Bold.ttf",
+  "persian_caption_font": "assets/fonts/Shabnam-Medium.ttf",
+  "cta": "کلمهٔ ACTIVE را کامنت کن"
 }

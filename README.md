@@ -2,7 +2,7 @@
 
 A Persian-language English-learning explainer using the supplied narrator recording, watercolor artwork, and progressive ink-outline reveals. Vertical 1080×1920, 25 fps. No generated voice, music, or added sound effects.
 
-Latest visual draft: [revision 5](my-explainer/out/diagram-v5.mp4), with image-led compositions, 6–8-second holds and one keyword band per frame. Notebook paper, bold type and the single active marker are retained. Actual speech-aligned one-word captions are still pending; the [caption style sample](my-explainer/previews/caption-style-sample.png) is not a timed subtitle export.
+Latest captioned **draft**: [revision 6](my-explainer/out/diagram-v6.mp4), with an explicit “comment ACTIVE” CTA, Shabnam Persian typography and one-word subtitles on a dark background. The subtitle text is complete, but its timing is **estimated and unverified**, not precise speech alignment. The image-led 6–8-second compositions, notebook paper and single marker remain.
 
 ## Watch or download
 
@@ -71,6 +71,23 @@ The 13 variable-length frames each remain for 6.4–7.8 seconds. A large primary
 `diagram_v5.json` defines the actual picture cuts, frame durations, keywords, illustration pairs and provisional audio references. Some picture cuts lead those references (planned L-cuts); others follow them (planned J-cuts). **These are editorial offsets against estimated reference points, not verified semantic speech alignment.** Narration remains continuous and unmodified; no artificial pauses or time stretching were introduced.
 
 Outputs: `my-explainer/out/diagram-v5.mp4`, `diagram-v5-preview.mp4` and `diagram-v5.zip`. Earlier versions remain available. This is the latest visual edit, not a claim that the outstanding word-caption alignment has been completed.
+
+## Revision 6 — explicit comment CTA, Shabnam, draft subtitles
+
+The closing card now reads **کلمهٔ ACTIVE را کامنت کن** rather than showing ACTIVE alone. The final picture contains an ACTIVE comment bubble and a send icon. The CTA appears from the provisional closing-offer anchor at 83.73 seconds and remains through the end.
+
+Official unmodified Shabnam Bold and Medium font files are bundled in `my-explainer/assets/fonts/` with the original license and upstream commit provenance. Bold is used for Persian headlines/CTA; Medium for Persian subtitles. Glyph coverage is checked and fallback fonts remain available.
+
+```bash
+python3 my-explainer/estimate_caption_draft.py
+python3 my-explainer/diagram_render.py --revision 6 \
+  --word-captions my-explainer/word-captions.estimated.json \
+  --allow-estimated-captions
+```
+
+**Timing limitation:** speech-model access still returned HTTP 403. Instead of withholding all subtitles, this draft displays all 238 words of the supplied transcript. Line anchors were inferred from script order and detected pauses; word durations were weighted over voiced regions. This is not ASR or forced alignment and has not been verified by listening against every word. Errors and drift remain possible. It must not be described as a final synchronized subtitle track.
+
+`word-captions.estimated.json` retains `reviewed: false` and `timing_status: estimated-draft`; normal rendering rejects it without the explicit draft flag. The `.srt` sidecar is provided for review/editing. Never mark timings reviewed merely to bypass validation. The ZIP includes the MP4, estimated timing sidecars and a status note. Original audio content, speed and duration are preserved.
 
 ## Setup
 

@@ -12,11 +12,14 @@ W,H,FPS=1080,1920,25
 INK='#263446'; BLUE='#336cce'; GREEN='#23846e'; GOLD='#dfaa42'; RED='#d7635d'
 FA='/usr/share/fonts/truetype/noto/NotoSansArabic-Bold.ttf'; EN='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 ap=argparse.ArgumentParser();ap.add_argument('--preview',type=float)
-ap.add_argument('--revision',type=int,choices=[3,4,5],default=3)
+ap.add_argument('--revision',type=int,choices=[3,4,5,6],default=3)
 ap.add_argument('--word-captions',type=Path)
 ap.add_argument('--style-still',type=float)
 ap.add_argument('--sample-word')
-a=ap.parse_args();v4=a.revision>=4;v5=a.revision==5
+ap.add_argument('--allow-estimated-captions',action='store_true',help='Explicitly render unverified draft word timings; not a synchronization claim')
+a=ap.parse_args();v4=a.revision>=4;v5=a.revision>=5;v6=a.revision==6
+headline_font=P/'assets/fonts/Shabnam-Bold.ttf' if v6 else None
+subtitle_font=P/'assets/fonts/Shabnam-Medium.ttf' if v6 else None
 if a.sample_word and a.style_still is None:ap.error('--sample-word is for a still design sample only')
 edit=json.loads((P/'kinetic_edit.json').read_text()); beats=edit['beats']
 meta=json.loads((P/f'diagram_v{a.revision}.json').read_text())
@@ -26,7 +29,8 @@ if v5:beats=[[f['start'],f['keyword'],''] for f in meta['frames']]
 if v4:beats=[[t,normalize(title),normalize(label)] for t,title,label in beats]
 raw=subprocess.check_output(['ffmpeg','-v','error','-i',str(P/'source.mp3'),'-ar','44100','-ac','1','-f','s16le','-'])
 D=len(raw)/88200;duration=min(a.preview,D) if a.preview else D
-word_cues=load_cues(a.word_captions,P/'source.mp3',D) if a.word_captions else []
+word_cues=load_cues(a.word_captions,P/'source.mp3',D,a.allow_estimated_captions) if a.word_captions else []
+if a.allow_estimated_captions:print('DRAFT caption timing enabled: not verified speech alignment.',flush=True)
 # Soft stationery grain: no stretched strips, decorative headers or slide numbers.
 rng=np.random.default_rng(47);noise=rng.normal(0,.65,(H,W,1))
 paper=Image.fromarray(np.uint8(np.clip(np.array([253,250,242])[None,None,:]+noise,0,255)))
@@ -119,6 +123,9 @@ def make(name,index):
  elif name=='bars':
   b.line([(-125,-140),(-125,125),(130,125)])
   for x,hh in [(-85,65),(-10,130),(65,210)]:b.box(x,125-hh,45,hh,GREEN)
+ elif name=='send':
+  b.poly([(-115,-90),(125,-10),(-75,115),(-55,15)],BLUE)
+  b.line([(-55,15),(125,-10)])
  elif name=='light':
   b.ellipse(0,-55,75,80,GOLD);b.line([(-45,10),(-30,65),(30,65),(45,10)]);b.box(-30,65,60,30)
   for aa in [-2.8,-2,-1.2,-.4]:b.line([(105*math.cos(aa),-55+105*math.sin(aa)),(135*math.cos(aa),-55+135*math.sin(aa))])
@@ -188,7 +195,7 @@ for i,(_,title,sub) in enumerate(beats):
  for key,text,cy,maxwidth,size in specs:
   rtl=any('\u0600'<=ch<='\u06ff' for ch in text)
   while True:
-   selected=font_path(text) if v4 else FA if rtl else EN
+   selected=font_path(text,headline_font if rtl else None) if v4 else FA if rtl else EN
    font=ImageFont.truetype(selected,size)
    if font.getlength(text)<=maxwidth:break
    size-=1
@@ -268,15 +275,31 @@ def build_v5(t):
  elif age<2.65:pen(im,ltip,INK)
  elif age<3.8:pen(im,stip,INK)
  elif age<4.35:pen(im,sctip,scolor)
- write(im,index,'title',(age-4.35)/.9)
+ if not v6 or t<meta['cta']['start']:write(im,index,'title',(age-4.35)/.9)
  if marker_count>1:raise AssertionError(f'Multiple markers at {t}: {marker_count}')
+ if v6:
+  if index==len(frames)-1 and age>=2.45:
+   d=ImageDraw.Draw(im);f=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',74)
+   d.text((430,730),'ACTIVE',font=f,anchor='mm',fill=INK)
+  if t>=meta['cta']['start']:draw_cta(im)
  cue=next((c for c in word_cues if c['start']<=t<c['end']),None)
- if cue:caption(im,cue['text'])
+ if cue:caption(im,cue['text'],subtitle_font)
  return im
+
+def draw_cta(im):
+ d=ImageDraw.Draw(im)
+ d.rounded_rectangle((130,1330,950,1620),radius=30,fill='#20334c',outline='#e3b85d',width=3)
+ # Three deliberate text runs keep English spelling and Persian order unambiguous.
+ f=ImageFont.truetype(str(headline_font),44)
+ d.text((540,1374),'کلمهٔ',font=f,anchor='mm',direction='rtl',fill='#ffffff')
+ en=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',92)
+ d.text((540,1467),'ACTIVE',font=en,anchor='mm',fill='#f1c96f')
+ f=ImageFont.truetype(str(headline_font),58)
+ d.text((540,1562),'را کامنت کن',font=f,anchor='mm',direction='rtl',fill='#ffffff')
 if a.style_still is not None:
  im=build(a.style_still)
  if a.sample_word:caption(im,a.sample_word)
- path=P/'previews'/'caption-style-sample.png';im.save(path)
+ path=P/'previews'/(f'diagram-v{a.revision}-style.png' if v6 else 'caption-style-sample.png');im.save(path)
  print(f'{path} (design sample only, not word timing)');raise SystemExit(0)
 out=P/'out'/(f'diagram-v{a.revision}-preview.mp4' if a.preview else f'diagram-v{a.revision}.mp4')
 cmd=['ffmpeg','-y','-v','error','-f','rawvideo','-pix_fmt','rgb24','-s',f'{W}x{H}','-r',str(FPS),'-i','-','-i',str(P/'source.mp3'),'-map','0:v','-map','1:a','-c:v','libx264','-threads','4','-preset','fast','-crf','19','-pix_fmt','yuv420p','-c:a','aac','-ar','44100','-b:a','192k','-t',str(duration),'-movflags','+faststart',str(out)]
