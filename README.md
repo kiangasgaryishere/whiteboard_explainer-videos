@@ -27,6 +27,17 @@ python3 my-explainer/kinetic_render.py
 
 The new output is `my-explainer/out/kinetic-marker-v2.mp4`; the earlier drafts are retained. This revision increases teaching text as requested and supersedes the earlier sparse-text treatment. It does not resolve the outstanding speech-alignment dependency.
 
+## Visual revision 3 — complete drawn diagrams
+
+`diagram_render.py` replaces the raster illustration approach with 26 simple, entirely authored vector drawings arranged into 13 vertical two-node charts. A marker draws every intended outline, then a colored marker fills regions with clipped strokes, then the labels are written. Illustrations and text have separate fixed vertical bands. The original audio remains the only sound.
+
+```bash
+python3 my-explainer/diagram_render.py --preview 14.4
+python3 my-explainer/diagram_render.py
+```
+
+Outputs: `my-explainer/out/diagram-v3.mp4` and a separately packaged `diagram-v3.zip`. `diagram_v3.json` records the layout, drawing phases and short labels; `kinetic_edit.json` supplies the inherited provisional editorial beats. These are on-board teaching labels, not verified speech-aligned subtitles. The full export adjusts the last video packet to match the original recording's playable length.
+
 ## Setup
 
 Use Python 3.12 and FFmpeg/ffprobe. The renderer uses Debian/Ubuntu fonts from `fonts-noto-core` and `fonts-dejavu-core` (Noto Sans Arabic Bold and DejaVu Sans Bold); install those fonts or update the font paths when using another operating system.

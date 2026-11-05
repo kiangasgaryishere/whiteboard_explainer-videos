@@ -1,0 +1,50 @@
+{
+  "revision": 3,
+  "layout": "13 vertical two-node diagrams; separate drawing and label bands",
+  "diagram_count": 13,
+  "authored_drawing_count": 26,
+  "source": "Original vector strokes; no traced raster artwork",
+  "phase_seconds": {
+    "outline": 1.4,
+    "marker_color": 0.65,
+    "parallel_text_write": 0.9,
+    "reading_hold": 0.65
+  },
+  "node_interval_seconds": 3.6,
+  "text_regions": {
+    "upper_title_y": 820,
+    "upper_label_y": 920,
+    "lower_title_y": 1440,
+    "lower_label_y": 1540
+  },
+  "audio": "source.mp3, unchanged narration only",
+  "synchronization": "Provisional editorial cues inherited from kinetic_edit.json; not verified speech-aligned captions",
+  "short_labels": [
+    "سه عادت آشنا",
+    "ثبت در دفتر",
+    "تعریف دیکشنری",
+    "مثال آماده",
+    "شناختن معنی",
+    "یادآوری سخت",
+    "لغات غیرفعال",
+    "استفادهٔ سخت",
+    "از معنی",
+    "تا کاربرد",
+    "گفتن و نوشتن",
+    "سه قدم",
+    "موقعیت واقعی",
+    "پیشنهاد بگیر",
+    "پیشنهاد دادن",
+    "تلفظ و کاربرد",
+    "a dish?",
+    "جواب خودت",
+    "the pasta.",
+    "کاربرد در مکالمه",
+    "یک موضوع",
+    "مثال و صوت",
+    "تمرین و اسپیکینگ",
+    "بستهٔ هفتگی",
+    "کامنت کن",
+    "Learn to use them!"
+  ]
+}
