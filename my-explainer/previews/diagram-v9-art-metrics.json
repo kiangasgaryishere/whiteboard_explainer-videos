@@ -1,0 +1,119 @@
+[
+  {
+    "frame": 1,
+    "retained_concepts": [
+      "person",
+      "book"
+    ],
+    "context_inset_bbox_area_ratio": 0.3,
+    "target": 0.3
+  },
+  {
+    "frame": 2,
+    "retained_concepts": [
+      "dictionary",
+      "notebook"
+    ],
+    "context_inset_bbox_area_ratio": 0.3,
+    "target": 0.3
+  },
+  {
+    "frame": 3,
+    "retained_concepts": [
+      "talk",
+      "question"
+    ],
+    "context_inset_bbox_area_ratio": 0.3,
+    "target": 0.3
+  },
+  {
+    "frame": 4,
+    "retained_concepts": [
+      "brain",
+      "lock"
+    ],
+    "context_inset_bbox_area_ratio": 0.3,
+    "target": 0.3
+  },
+  {
+    "frame": 5,
+    "retained_concepts": [
+      "unlock",
+      "talk"
+    ],
+    "context_inset_bbox_area_ratio": 0.3,
+    "target": 0.3
+  },
+  {
+    "frame": 6,
+    "retained_concepts": [
+      "flow",
+      "light"
+    ],
+    "context_inset_bbox_area_ratio": 0.3,
+    "target": 0.3
+  },
+  {
+    "frame": 7,
+    "retained_concepts": [
+      "table",
+      "waiter"
+    ],
+    "context_inset_bbox_area_ratio": 0.3,
+    "target": 0.3
+  },
+  {
+    "frame": 8,
+    "retained_concepts": [
+      "dictionary",
+      "headphones"
+    ],
+    "context_inset_bbox_area_ratio": 0.3,
+    "target": 0.3
+  },
+  {
+    "frame": 9,
+    "retained_concepts": [
+      "question",
+      "person"
+    ],
+    "context_inset_bbox_area_ratio": 0.3,
+    "target": 0.3
+  },
+  {
+    "frame": 10,
+    "retained_concepts": [
+      "pasta",
+      "reply"
+    ],
+    "context_inset_bbox_area_ratio": 0.3,
+    "target": 0.3
+  },
+  {
+    "frame": 11,
+    "retained_concepts": [
+      "calendar",
+      "cards"
+    ],
+    "context_inset_bbox_area_ratio": 0.3,
+    "target": 0.3
+  },
+  {
+    "frame": 12,
+    "retained_concepts": [
+      "worksheet",
+      "talk"
+    ],
+    "context_inset_bbox_area_ratio": 0.272,
+    "target": 0.3
+  },
+  {
+    "frame": 13,
+    "retained_concepts": [
+      "bubble",
+      "send"
+    ],
+    "context_inset_bbox_area_ratio": 0.3,
+    "target": 0.3
+  }
+]

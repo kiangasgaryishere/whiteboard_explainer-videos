@@ -21,10 +21,10 @@
     "paperCenter": "#ffffff",
     "paperEdge": "#f1f0ea"
   },
-  "renderer": "diagram_render.py --revision 8 --word-captions word-captions.estimated.json --allow-estimated-captions",
+  "renderer": "diagram_render.py --revision 9 --word-captions word-captions.estimated.json --allow-estimated-captions",
   "audio": "source.mp3",
   "timing_status": "awaiting_verified_alignment",
-  "visual_beat_seconds": "variable 6.4–7.8 second frames",
+  "visual_beat_seconds": "variable 6.2–7.95 second frames",
   "marker_colors": [
     "charcoal",
     "blue",
@@ -49,5 +49,7 @@
   "concurrent_markers": true,
   "active_marker_limit": 2,
   "caption_font_size": 58,
-  "caption_box_height": 108
+  "caption_box_height": 108,
+  "art_direction": "Detailed curved doodles, expressive clothed characters, perspective props, contextual insets",
+  "context_inset_bbox_area_target_ratio": 0.3
 }

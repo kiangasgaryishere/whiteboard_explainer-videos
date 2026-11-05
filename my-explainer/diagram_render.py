@@ -3,7 +3,7 @@ No image tracing or raster illustration dissolve. Voice alignment is provisional
 """
 import argparse, math, json, subprocess, bisect
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageChops
 import numpy as np
 import cv2
 from caption_style import normalize, font_path, load_cues, caption, group_cues
@@ -12,12 +12,13 @@ W,H,FPS=1080,1920,25
 INK='#263446'; BLUE='#336cce'; GREEN='#23846e'; GOLD='#dfaa42'; RED='#d7635d'
 FA='/usr/share/fonts/truetype/noto/NotoSansArabic-Bold.ttf'; EN='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 ap=argparse.ArgumentParser();ap.add_argument('--preview',type=float)
-ap.add_argument('--revision',type=int,choices=[3,4,5,6,7,8],default=3)
+ap.add_argument('--revision',type=int,choices=[3,4,5,6,7,8,9],default=3)
 ap.add_argument('--word-captions',type=Path)
 ap.add_argument('--style-still',type=float)
 ap.add_argument('--sample-word')
 ap.add_argument('--allow-estimated-captions',action='store_true',help='Explicitly render unverified draft word timings; not a synchronization claim')
-a=ap.parse_args();v4=a.revision>=4;v5=a.revision>=5;v6=a.revision>=6;v7=a.revision>=7;v8=a.revision==8
+ap.add_argument('--art-sheet',action='store_true')
+a=ap.parse_args();v4=a.revision>=4;v5=a.revision>=5;v6=a.revision>=6;v7=a.revision>=7;v8=a.revision>=8;v9=a.revision==9
 headline_font=P/'assets/fonts/Shabnam-Bold.ttf' if v6 else None
 subtitle_font=P/'assets/fonts/Shabnam-Medium.ttf' if v6 else None
 if a.sample_word and a.style_still is None:ap.error('--sample-word is for a still design sample only')
@@ -151,6 +152,35 @@ if v5:
  frames=meta['frames'];frame_starts=[f['start'] for f in frames]
  compositions=[(relocated(make(f['main'],0),430,760,1.65),relocated(make(f['support'],0),760,(1020 if i==len(frames)-1 else 1080) if v7 else 1130,.95)) for i,f in enumerate(frames)]
 
+if v9:
+ from art_direction import rich_icon, context_icon
+ def bounds(icon):
+  pts=[p for path,_,_ in icon.paths for p in path]
+  return min(p[0] for p in pts),min(p[1] for p in pts),max(p[0] for p in pts),max(p[1] for p in pts)
+ def area(icon):
+  x,y,xx,yy=bounds(icon);return (xx-x)*(yy-y)
+ previous_compositions=compositions;compositions=[];contexts9=[];plain9=[];art_metrics=[]
+ for i,f in enumerate(frames):
+  primary=relocated(rich_icon(Icon,f['main'],i),370 if i==0 else 400,850 if i==0 else 760,1.65)
+  secondary=relocated(rich_icon(Icon,f['support'],i),790 if i==0 else 760,1110 if i==0 else (930 if i>=11 else 980),.95)
+  base=context_icon(Icon,i);x,y,xx,yy=bounds(base);cw,ch=xx-x,yy-y
+  original_area=sum(area(b) for b in previous_compositions[i]);target=original_area*.30
+  scale=min(math.sqrt(target/(cw*ch)),380/cw,240/ch)
+  context=relocated(base,740,350,scale);contexts9.append(context)
+  plain=Icon(primary.cx,primary.cy,primary.s);plain.paths=list(primary.paths);plain.regions=list(primary.regions);plain9.append(plain)
+  _,top,_,bottom=bounds(primary);primary.split_cut=(top+bottom)/2
+  primary.paths+=context.paths;primary.regions+=context.regions
+  compositions.append((primary,secondary))
+  art_metrics.append({'frame':i+1,'retained_concepts':[f['main'],f['support']],'context_inset_bbox_area_ratio':round(area(context)/original_area,3),'target':.30})
+ (P/'previews'/'diagram-v9-art-metrics.json').write_text(json.dumps(art_metrics,indent=2))
+ # World-coordinate hook graphics: speech becomes visibly blocked, without SFX.
+ hook_speech=Icon(0,0,1);hook_speech.bubble(575,600,335,160,BLUE)
+ for x in [660,720,780]:hook_speech.ellipse(x,675,4,4)
+ hook_block=Icon(0,0,1);hook_block.box(522,692,52,54,RED)
+ hook_block.ellipse(548,692,18,22,start=math.pi,end=math.tau)
+ hook_block.line([(514,682),(581,754)],8,RED);hook_block.line([(581,682),(514,754)],8,RED)
+ hook_link=[([(465,735),(518,718)],INK,5)]
+
 def split_paths(paths, y):
  upper=[];lower=[]
  for pts,c,w in paths:
@@ -165,7 +195,7 @@ def split_paths(paths, y):
 if v8:
  split_art=[]
  for main,support in compositions:
-  ys=[p[1] for pts,_,_ in main.paths for p in pts];cut=(min(ys)+max(ys))/2
+  ys=[p[1] for pts,_,_ in main.paths for p in pts];cut=getattr(main,'split_cut',(min(ys)+max(ys))/2)
   split_art.append((split_paths(main.paths,cut),split_paths(main.colorpaths(),cut)))
 
 def length(pts):return sum(math.dist(a,z) for a,z in zip(pts,pts[1:]))
@@ -207,12 +237,20 @@ def pen(im,tip,c,approach=None):
  d.line([pt(-8,42),pt(-8,126)],fill='#b5bec7',width=2)
  if lower:d.line([pt(-11,111),pt(13,111)],fill='#243348',width=3)
 
-def strokes(im,paths,soft=False):
+paint_masks={}
+def strokes(im,paths,soft=False,clip=None):
  if soft:
   layer=Image.new('RGBA',im.size);d=ImageDraw.Draw(layer)
   for q,c,w in paths:
    c=tuple(int(c[j:j+2],16) for j in (1,3,5)) if c.startswith('#') else (150,180,220)
    d.line(q,fill=c+(115,),width=w,joint='curve')
+  if clip:
+   key=id(clip)
+   if key not in paint_masks:
+    mask=Image.new('L',im.size);md=ImageDraw.Draw(mask)
+    for polygon,_ in clip:md.polygon(polygon,fill=255)
+    paint_masks[key]=mask
+   layer.putalpha(ImageChops.multiply(layer.getchannel('A'),paint_masks[key]))
   im.paste(layer,(0,0),layer)
  else:
   d=ImageDraw.Draw(im)
@@ -320,14 +358,15 @@ def build_v5(t):
  return im
 
 def build_v8(t):
+ if v9:return build_v9(t)
  global marker_count
  marker_count=0
  index=max(0,min(len(frames)-1,bisect.bisect_right(frame_starts,t)-1))
  frame=frames[index];age=t-frame['start'];main,support=compositions[index]
  im=paper.copy();active=[]
  connector=[([(550,980),(570,1030),(620,1060)],INK,4),([(597,1057),(620,1060),(608,1040)],INK,4)]
- def task(paths,start,end,approach,soft=False):
-  traced,tip,color=partial(paths,(age-start)/(end-start));strokes(im,traced,soft)
+ def task(paths,start,end,approach,soft=False,clip=None):
+  traced,tip,color=partial(paths,(age-start)/(end-start));strokes(im,traced,soft,clip)
   if start<=age<end and tip is not None:active.append((tip,color,approach))
  if frame['draw_mode']=='split-primary':
   (upper,lower),(upper_color,lower_color)=split_art[index]
@@ -364,6 +403,73 @@ def build_v8(t):
  if cue:caption(im,cue['text'],subtitle_font,meta['caption_center_y'],meta['caption_font_size'],meta['caption_half_height'])
  return im
 
+def finish_v9(im,t,active):
+ for tip,color,approach in active:pen(im,tip,color,approach)
+ if marker_count>2:raise AssertionError(f'More than two markers at {t}: {marker_count}')
+ if t>=meta['cta']['start']:draw_cta(im)
+ cue=next((c for c in word_cues if c['start']<=t-audio_delay<c['end']),None)
+ if cue:caption(im,cue['text'],subtitle_font,meta['caption_center_y'],meta['caption_font_size'],meta['caption_half_height'])
+ return im
+
+def build_v9(t):
+ global marker_count
+ marker_count=0
+ index=max(0,min(len(frames)-1,bisect.bisect_right(frame_starts,t)-1))
+ if index==0:return hook_v9(t)
+ frame=frames[index];age=t-frame['start'];main,support=compositions[index]
+ im=paper.copy();active=[]
+ def task(paths,start,end,approach,soft=False,clip=None):
+  traced,tip,color=partial(paths,(age-start)/(end-start));strokes(im,traced,soft,clip)
+  if start<=age<end and tip is not None:active.append((tip,color,approach))
+ connector=[([(530,1000),(565,1030),(620,1040)],INK,4),([(599,1024),(620,1040),(596,1046)],INK,4)]
+ if frame['draw_mode']=='split-primary':
+  (upper,lower),(uc,lc)=split_art[index]
+  task(uc,2.8,3.65,'top',True,main.regions);task(lc,2.8,3.65,'bottom',True,main.regions)
+  task(upper,0,2.7,'top');task(lower,.15,2.8,'bottom')
+  task(support.colorpaths(),4.75,5.4,'bottom',True,support.regions);task(support.paths,3.65,4.75,'bottom')
+  task(connector,3.65,3.95,'top');text_start=3.95
+ else:
+  task(main.colorpaths(),2.65,3.55,'top',True,main.regions);task(main.paths,0,2.65,'top')
+  task(support.colorpaths(),4.0,5.2,'bottom',True,support.regions);task(support.paths,.2,4.0,'bottom')
+  task(connector,3.55,3.85,'top');text_start=3.85
+ if t<meta['cta']['start']:
+  write(im,index,'title',(age-text_start)/1.15,'top')
+  if index%3==1:
+   lines=[([(380,1405),(700,1405)],GREEN,4)]
+   task(lines,5.35,5.85,'top')
+ if index%2==0:
+  rays=[([(920,1020),(945,1007)],GOLD,4),([(926,1040),(952,1047)],GOLD,4)]
+  task(rays,5.4,5.95,'bottom')
+ if index==len(frames)-1 and age>=3.55:
+  d=ImageDraw.Draw(im);f=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',74)
+  d.text((main.cx,main.cy-25),'ACTIVE',font=f,anchor='mm',fill=INK)
+ return finish_v9(im,t,active)
+
+def hook_v9(t):
+ global marker_count
+ marker_count=0;im=paper.copy();active=[];main=plain9[0];support=compositions[0][1];context=contexts9[0]
+ def task(paths,start,end,approach,soft=False,clip=None):
+  traced,tip,c=partial(paths,(t-start)/(end-start));strokes(im,traced,soft,clip)
+  if start<=t<end and tip is not None:active.append((tip,c,approach))
+ task(main.colorpaths(),1.65,2.2,'top',True,main.regions);task(main.paths,0,1.65,'top')
+ task(context.colorpaths(),1.35,1.9,'bottom',True,context.regions);task(context.paths,.08,1.35,'bottom')
+ task(hook_speech.colorpaths(),2.85,3.05,'top',True,hook_speech.regions);task(hook_speech.paths,2.2,2.85,'top')
+ task(hook_link,1.9,2.2,'bottom');task(hook_block.colorpaths(),2.85,3.1,'bottom',True,hook_block.regions);task(hook_block.paths,2.2,2.85,'bottom')
+ task(support.colorpaths(),4.75,5.4,'bottom',True,support.regions);task(support.paths,3.15,4.75,'bottom')
+ # Word cards travel towards speech, hit the blockage and recoil: a visual hook,
+ # not an invented number/claim or a change to the narrator's supplied words.
+ if 1.15<t<3.25:
+  d=ImageDraw.Draw(im)
+  for k in range(3):
+   u=max(0,min(.91,(t-1.15-k*.15)/1.05))
+   if u<=0:continue
+   if t>2.25:u=max(0,u-.09*abs(math.sin((t-2.25)*8)))
+   x=730-180*u;y=450+250*u
+   d.rounded_rectangle((x-15,y-12,x+15,y+12),radius=3,fill=['#729dcc','#e3b85d','#77a58e'][k],outline=INK,width=2)
+   d.line([(x-8,y-3),(x+8,y-3)],fill=INK,width=2)
+ write(im,0,'title',(t-3.1)/.85,'top')
+ return finish_v9(im,t,active)
+
 def draw_cta(im):
  d=ImageDraw.Draw(im)
  if v7:
@@ -386,6 +492,12 @@ if a.style_still is not None:
  if a.sample_word:caption(im,a.sample_word,subtitle_font,meta['caption_center_y'] if v7 else 1735)
  path=P/'previews'/(f'diagram-v{a.revision}-style.png' if v6 else 'caption-style-sample.png');im.save(path)
  print(f'{path} (design sample only, not word timing)');raise SystemExit(0)
+if a.art_sheet:
+ sheet=Image.new('RGB',(1080,1920),'#e2e5e6')
+ for i,f in enumerate(frames):
+  im=build(f['end']-.35);im.save(P/'previews'/f'diagram-v{a.revision}-art-{i+1:02d}.png')
+  sheet.paste(im.resize((270,480)),((i%4)*270,(i//4)*480))
+ sheet.save(P/'previews'/f'diagram-v{a.revision}-art-sheet.png');print('Art sheet saved.');raise SystemExit(0)
 out=P/'out'/(f'diagram-v{a.revision}-preview.mp4' if a.preview else f'diagram-v{a.revision}.mp4')
 cmd=['ffmpeg','-y','-v','error','-f','rawvideo','-pix_fmt','rgb24','-s',f'{W}x{H}','-r',str(FPS),'-i','-','-i',str(P/'source.mp3'),'-map','0:v','-map','1:a','-c:v','libx264','-threads','4','-preset','fast','-crf','19','-pix_fmt','yuv420p','-c:a','aac','-ar','44100','-b:a','192k','-t',str(duration),'-movflags','+faststart',str(out)]
 if audio_delay:cmd=cmd[:-1]+['-af',f'adelay={round(audio_delay*1000)}:all=1']+cmd[-1:]
@@ -408,7 +520,7 @@ if not a.preview:
  tmp=out.with_name(out.stem+'-timed.mp4')
  subprocess.run(['ffmpeg','-y','-v','error','-i',str(out),'-map','0','-c','copy','-bsf:v',filt,'-video_track_timescale','44100','-movflags','+faststart',str(tmp)],check=True);tmp.replace(out)
 if v8:
- (P/'previews'/f'diagram-v8-marker-activity{"-preview" if a.preview else ""}.json').write_text(json.dumps({'total_frames':sum(marker_activity.values()),'count_basis':'rendered frames before mux rounding','encoded_frames':None if a.preview else int(meta['streams'][0]['nb_frames']),'frames_by_visible_marker_count':marker_activity},indent=2))
+ (P/'previews'/f'diagram-v{a.revision}-marker-activity{"-preview" if a.preview else ""}.json').write_text(json.dumps({'total_frames':sum(marker_activity.values()),'count_basis':'rendered frames before mux rounding','encoded_frames':None if a.preview else int(meta['streams'][0]['nb_frames']),'frames_by_visible_marker_count':marker_activity},indent=2))
  print('Marker activity:',marker_activity,flush=True)
 if v7 and word_cues and not a.preview:
  source=json.loads(a.word_captions.read_text())

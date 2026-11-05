@@ -2,7 +2,7 @@
 
 A Persian-language English-learning explainer using the supplied narrator recording, watercolor artwork, and progressive ink-outline reveals. Vertical 1080×1920, 25 fps. No generated voice, music, or added sound effects.
 
-Latest captioned **draft**: [revision 8](my-explainer/out/diagram-v8.mp4), with two genuinely simultaneous markers, smaller phrase captions, and only a half-second narration delay for a quicker hook. Shabnam typography, notebook paper and the explicit “comment ACTIVE” CTA remain. Base subtitle timing is **estimated and unverified**, not precise speech alignment.
+Latest captioned **draft**: [revision 9](my-explainer/out/diagram-v9.mp4) / [ZIP](my-explainer/out/diagram-v9.zip), with richer illustrations, transcript-related contextual insets and a new four-second visual hook. Two concurrent markers, smaller phrase captions, notebook texture and the half-second narration delay remain. Base subtitle timing is **estimated and unverified**, not precise speech alignment.
 
 ## Watch or download
 
@@ -163,3 +163,17 @@ The numbers above illustrate the schema, not verified timing. Valid assets: `stu
 `tools/whiteboard-video/` preserves the original [whiteboard-video-skill](https://github.com/Matteoikarieth96/whiteboard-video-skill) at commit `75c7825e3ccaf33be933a143c561acab1deb74a6`, with its MIT license and bundled font license. Its Node dependencies can be installed with `npm ci --prefix tools/whiteboard-video/scripts`. The current watercolor renderer does not require Chromium or these Node dependencies. The upstream Chromium renderer was blocked by the managed browser's local-file policy during onboarding.
 
 Watercolor scene artwork was generated with OpenAI image generation using the approved style references. Original filenames are recorded in `my-explainer/assets/manifest.json`. Machine-specific paths in the production brief are historical provenance; use the relative repository paths above for current work.
+
+## Visual revision 9 — richer authored illustrations and a visual hook
+
+`art_direction.py` supplies curved, expressive clothed characters, perspective page edges, material hatching, restaurant tableware, headphones and pasta details. Each scene gains a relevant contextual inset: recognition/magnifier, hesitation clock, restaurant awning, menu, spoken example, practice microphone or weekly gift. The inset target is 30% of the existing illustration bounding-box footprint (measured 27.2–30%, mean about 29.8%); this measures layout footprint, not painted pixels. Keywords and subtitle safe areas remain separate.
+
+The first four seconds show a worried learner and word cards, a blocked speech path with a red lock/cross, and “بلدی، ولی نمی‌گی؟”. This visual question builds on the existing narration; no new voice, music or SFX are added. Two opposing markers draw in parallel, then color clipped regions and write the keyword. The 13 scene windows and original voice remain; the export includes a 0.5s picture lead and lasts 93.893696s.
+
+```sh
+PYTHONPATH=/workspace/whiteboard-tools python3 my-explainer/diagram_render.py --revision 9 \
+  --word-captions my-explainer/word-captions.estimated.json --allow-estimated-captions
+# Add --preview 6.9 for the opening, or --art-sheet for the 13-scene review sheet.
+```
+
+Outputs: `out/diagram-v9.mp4`, `out/diagram-v9.zip`, `previews/diagram-v9-art-sheet.png`, art footprint metrics and per-frame marker counts. Caption text is preserved, but inherited speech timings and semantic cut anchors remain estimated/unreviewed.
