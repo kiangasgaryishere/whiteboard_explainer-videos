@@ -2,7 +2,7 @@
 
 A Persian-language English-learning explainer using the supplied narrator recording, watercolor artwork, and progressive ink-outline reveals. Vertical 1080×1920, 25 fps. No generated voice, music, or added sound effects.
 
-Latest captioned **draft**: [revision 10](my-explainer/out/diagram-v10.mp4) / [ZIP](my-explainer/out/diagram-v10.zip). Text-first direction, recurring adult learner, continuing restaurant scene, gentle reframing, shaded opposing markers and a cream paper background reconstructed from the user reference. Base speech/caption timing remains **estimated and unverified**.
+Latest captioned **draft**: [revision 11](my-explainer/out/diagram-v11.mp4) / [ZIP](my-explainer/out/diagram-v11.zip). Instant black headings, slightly slower pen movement, a four-second notebook/blocked-speech hook and semantic camera direction. Original narration, cream paper, captions and two opposing markers remain. Base speech/caption timing is **estimated and unverified**.
 
 ## Watch or download
 
@@ -195,3 +195,17 @@ PYTHONPATH=/workspace/whiteboard-tools python3 my-explainer/diagram_render.py --
 Review images: `previews/diagram-v10-opening-sequence.jpg` and `diagram-v10-art-sheet.png`. Pixel checks of actual rendered frames confirm that new artwork does not appear before the headline and keywords do not appear before picture completion. The prior restaurant context is intentionally retained. Original narration remains complete with the previously requested 0.5s delay: output duration 93.893696s. Subtitle cues, teaching scene boundaries and semantic J/L anchors are inherited estimates, not newly verified speech alignment.
 
 V10 English examples are written first as the opening headline and remain for their full 6.6s/7s scene windows; the shorter RECOMMEND / USE keyword follows the drawing. This avoids introducing a full teaching sentence only at the end of the scene.
+
+## Visual revision 11 — instant headings and directed camera beats
+
+Black headings now appear complete on scene entry; no heading is written by a marker. Illustration starts at 0.18s. Actual pen traversal durations are multiplied by 1.08 (about 7.4% lower path speed), and keywords also write 8% more slowly after the picture. Standard drawing ends at 4.2192s, followed by keyword lettering from 4.3272–5.4612s. This supersedes V10's animated opening headlines.
+
+`direction_v11.py` extends the V10 art/character system. The first four seconds establish the question immediately, draw the learner's worried expression and speech bubble early, and send word cards toward a red speech barrier before they recoil. Camera keyframes move from notebook focus toward the learner and pull out to reveal the contrast. Other shots use a worried-learner push-in, passive/active reframing, restaurant establishing view, listening detail, stable English-example frames and a confident-learner callback at the CTA. Text and subtitle positions remain fixed. Semantic camera movement is driven by the existing scene plan; it does not establish verified speech synchronization.
+
+```sh
+PYTHONPATH=/workspace/whiteboard-tools python3 my-explainer/diagram_render.py --revision 11 \
+  --word-captions my-explainer/word-captions.estimated.json --allow-estimated-captions
+# --art-sheet reviews all scenes; --preview 6.9 reviews the opening.
+```
+
+Review: `previews/diagram-v11-hook-sequence.jpg`, `diagram-v11-art-sheet.png`, direction validation and per-frame marker counts. The cream background remains an AI reconstruction of the inline user reference; exact original background pixels were unavailable. Original audio is complete with the previously requested 0.5s delay; no added music/SFX. Caption and semantic J/L timing remain inherited, unreviewed estimates.

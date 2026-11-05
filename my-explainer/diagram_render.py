@@ -12,13 +12,13 @@ W,H,FPS=1080,1920,25
 INK='#263446'; BLUE='#336cce'; GREEN='#23846e'; GOLD='#dfaa42'; RED='#d7635d'
 FA='/usr/share/fonts/truetype/noto/NotoSansArabic-Bold.ttf'; EN='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 ap=argparse.ArgumentParser();ap.add_argument('--preview',type=float)
-ap.add_argument('--revision',type=int,choices=[3,4,5,6,7,8,9,10],default=3)
+ap.add_argument('--revision',type=int,choices=[3,4,5,6,7,8,9,10,11],default=3)
 ap.add_argument('--word-captions',type=Path)
 ap.add_argument('--style-still',type=float)
 ap.add_argument('--sample-word')
 ap.add_argument('--allow-estimated-captions',action='store_true',help='Explicitly render unverified draft word timings; not a synchronization claim')
 ap.add_argument('--art-sheet',action='store_true')
-a=ap.parse_args();v4=a.revision>=4;v5=a.revision>=5;v6=a.revision>=6;v7=a.revision>=7;v8=a.revision>=8;v9=a.revision>=9;v10=a.revision==10
+a=ap.parse_args();v4=a.revision>=4;v5=a.revision>=5;v6=a.revision>=6;v7=a.revision>=7;v8=a.revision>=8;v9=a.revision>=9;v10=a.revision>=10;v11=a.revision==11
 headline_font=P/'assets/fonts/Shabnam-Bold.ttf' if v6 else None
 subtitle_font=P/'assets/fonts/Shabnam-Medium.ttf' if v6 else None
 if a.sample_word and a.style_still is None:ap.error('--sample-word is for a still design sample only')
@@ -282,7 +282,7 @@ for i,(_,title,sub) in enumerate(beats):
    size-=1
   cx=540
   layer=Image.new('RGBA',(W,H));d=ImageDraw.Draw(layer)
-  d.text((cx,cy),text,font=font,anchor='mm',fill=BLUE if key=='title' else INK,direction='rtl' if rtl else 'ltr',stroke_width=1 if v4 and key=='title' else 0)
+  d.text((cx,cy),text,font=font,anchor='mm',fill=('#151515' if v11 and key=='intro' else BLUE if key=='title' else INK),direction='rtl' if rtl else 'ltr',stroke_width=1 if v4 and key=='title' else 0)
   mask=np.array(layer.getchannel('A'));contours,_=cv2.findContours(np.uint8(mask>10)*255,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
   contours=sorted(contours,key=lambda c:float(c[:,:,0].mean()),reverse=rtl)
   paths=[([tuple(p) for p in c[:,0,:]]+[tuple(c[0,0,:])],BLUE if key=='title' else INK,3) for c in contours]
@@ -501,7 +501,10 @@ def draw_cta(im):
  f=ImageFont.truetype(str(headline_font),58)
  d.text((540,1562),'را کامنت کن',font=f,anchor='mm',direction='rtl',fill='#ffffff')
 if v10:
- from direction_v10 import Director
+ if v11:
+  from direction_v11 import Director
+ else:
+  from direction_v10 import Director
  director10=Director(globals())
 if a.style_still is not None:
  im=build(a.style_still)

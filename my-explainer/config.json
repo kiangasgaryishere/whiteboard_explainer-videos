@@ -21,7 +21,7 @@
     "paperCenter": "#ffffff",
     "paperEdge": "#f1f0ea"
   },
-  "renderer": "diagram_render.py --revision 10 --word-captions word-captions.estimated.json --allow-estimated-captions",
+  "renderer": "diagram_render.py --revision 11 --word-captions word-captions.estimated.json --allow-estimated-captions",
   "audio": "source.mp3",
   "timing_status": "awaiting_verified_alignment",
   "visual_beat_seconds": "variable 6.2–7.95 second frames",
@@ -34,7 +34,7 @@
   "single_marker": false,
   "headline_size": 62,
   "word_captions_status": "Complete transcript displayed with estimated, unverified timing; draft only",
-  "text_policy": "Curiosity headline first (0–1.05s), new picture (1.18–4.92s), optional keyword (5.02–6.07s)",
+  "text_policy": "Black heading complete from scene entry, never pen-written; illustration starts at .18s; optional keyword follows picture",
   "persian_headline_font": "assets/fonts/Shabnam-Bold.ttf",
   "persian_caption_font": "assets/fonts/Shabnam-Medium.ttf",
   "cta": "کلمهٔ ACTIVE را کامنت کن",
@@ -50,7 +50,8 @@
   "active_marker_limit": 2,
   "caption_font_size": 58,
   "caption_box_height": 108,
-  "art_direction": "Recurring adult learner, continuing restaurant context, gentle reframing and shaded opposing pens",
+  "art_direction": "Four-second notebook/blocked-speech hook, semantic camera focus, locked English example shots, confident-character callback",
   "context_inset_bbox_area_target_ratio": 0.3,
-  "background_provenance": "AI reconstruction based on the user inline reference; not the original pixel file"
+  "background_provenance": "AI reconstruction based on the user inline reference; not the original pixel file",
+  "marker_duration_multiplier": 1.08
 }

@@ -1,0 +1,10 @@
+{
+  "scenes": 13,
+  "heading_visible_at_scene_start": true,
+  "heading_opaque_pixels_constant_across_sampled_phases": true,
+  "heading_write_calls": 0,
+  "pen_traversal_duration_ratio": 1.08,
+  "path_speed_ratio": 0.9259259259259258,
+  "voice_alignment": "Inherited estimated timings, not verified",
+  "cta_no_interrupted_keyword": true
+}
