@@ -2,6 +2,8 @@
 
 A Persian-language English-learning explainer using the supplied narrator recording, watercolor artwork, and progressive ink-outline reveals. Vertical 1080×1920, 25 fps. No generated voice, music, or added sound effects.
 
+Latest visual draft: [revision 4](my-explainer/out/diagram-v4.mp4), with notebook paper, bold headlines, repaired font glyphs and a single active marker. [Caption style sample](my-explainer/previews/caption-style-sample.png). Actual speech-aligned one-word captions are still pending; the sample is not a timed subtitle export.
+
 ## Watch or download
 
 - [Full-length narrated draft](my-explainer/out/narrated-visual-draft.mp4)
@@ -37,6 +39,25 @@ python3 my-explainer/diagram_render.py
 ```
 
 Outputs: `my-explainer/out/diagram-v3.mp4` and a separately packaged `diagram-v3.zip`. `diagram_v3.json` records the layout, drawing phases and short labels; `kinetic_edit.json` supplies the inherited provisional editorial beats. These are on-board teaching labels, not verified speech-aligned subtitles. The full export adjusts the last video packet to match the original recording's playable length.
+
+## Visual revision 4 — notebook paper, bold type, one marker
+
+```bash
+python3 my-explainer/diagram_render.py --revision 4
+python3 my-explainer/diagram_render.py --revision 4 --style-still 21.35 --sample-word معنی
+```
+
+Revision 4 uses a generated notebook-paper texture based on the supplied reference, larger bold headlines, glyph-coverage preflight and punctuation normalization, and sequential marker actions. Every rendered frame checks that at most one marker is drawn. The missing square in `می‌دونی…` came from U+2026 (ellipsis), which the Arabic font does not cover; it was not an emoji. The new font handling prevents silently rendering unsupported characters.
+
+**Caption status:** the one-word caption layout is implemented, but verified word timestamps are still unavailable. The standard `diagram-v4.mp4` is a visual revision without spoken captions. `previews/caption-style-sample.png` demonstrates the proposed caption background with a sample word; it is a still typography sample, not an aligned subtitle export.
+
+To render actual word captions once timings have been verified:
+
+```bash
+python3 my-explainer/diagram_render.py --revision 4 --word-captions my-explainer/word-captions.json
+```
+
+The timing file must contain `reviewed: true`, `source_sha256` matching `source.mp3`, and a nonempty `words` array of `{start, end, text}` entries. Each entry must be one word, inside the recording's playable duration, chronologically ordered and nonoverlapping. Unreviewed, stale or invalid timing files are rejected. No estimated timing file is supplied as if verified. Speech-model downloads remain blocked by the cloud network policy; the recording itself needs no additional voice generation.
 
 ## Setup
 

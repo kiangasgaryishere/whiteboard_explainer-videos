@@ -6,20 +6,31 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import cv2
+from caption_style import normalize, font_path, load_cues, caption
 P=Path(__file__).parent
 W,H,FPS=1080,1920,25
 INK='#263446'; BLUE='#336cce'; GREEN='#23846e'; GOLD='#dfaa42'; RED='#d7635d'
 FA='/usr/share/fonts/truetype/noto/NotoSansArabic-Bold.ttf'; EN='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
-ap=argparse.ArgumentParser();ap.add_argument('--preview',type=float);a=ap.parse_args()
+ap=argparse.ArgumentParser();ap.add_argument('--preview',type=float)
+ap.add_argument('--revision',type=int,choices=[3,4],default=3)
+ap.add_argument('--word-captions',type=Path)
+ap.add_argument('--style-still',type=float)
+ap.add_argument('--sample-word')
+a=ap.parse_args();v4=a.revision==4
+if a.sample_word and a.style_still is None:ap.error('--sample-word is for a still design sample only')
 edit=json.loads((P/'kinetic_edit.json').read_text()); beats=edit['beats']
-meta=json.loads((P/'diagram_v3.json').read_text())
+meta=json.loads((P/f'diagram_v{a.revision}.json').read_text())
 if 'short_labels' in meta:
  beats=[[t,title,label] for (t,title,_),label in zip(beats,meta['short_labels'])]
+if v4:beats=[[t,normalize(title),normalize(label)] for t,title,label in beats]
 raw=subprocess.check_output(['ffmpeg','-v','error','-i',str(P/'source.mp3'),'-ar','44100','-ac','1','-f','s16le','-'])
 D=len(raw)/88200;duration=min(a.preview,D) if a.preview else D
+word_cues=load_cues(a.word_captions,P/'source.mp3',D) if a.word_captions else []
 # Soft stationery grain: no stretched strips, decorative headers or slide numbers.
 rng=np.random.default_rng(47);noise=rng.normal(0,.65,(H,W,1))
 paper=Image.fromarray(np.uint8(np.clip(np.array([253,250,242])[None,None,:]+noise,0,255)))
+if v4:paper=Image.open(P/'assets'/'notebook-paper.png').convert('RGB').resize((W,H),Image.Resampling.LANCZOS)
+marker_count=0
 class Icon:
  def __init__(self,cx,cy,s=1):self.cx=cx;self.cy=cy;self.s=s;self.paths=[];self.regions=[]
  def point(self,x,y):return(self.cx+x*self.s,self.cy+y*self.s)
@@ -118,6 +129,7 @@ icons=[make(n,i) for i,n in enumerate(names)]
 
 def length(pts):return sum(math.dist(a,z) for a,z in zip(pts,pts[1:]))
 def partial(paths,p):
+ if p<=0 or not paths:return [],None,INK
  budget=sum(length(q) for q,_,_ in paths)*max(0,min(1,p));result=[];tip=None;color=INK
  for pts,c,w in paths:
   line=[pts[0]]
@@ -132,7 +144,9 @@ def partial(paths,p):
  return result,tip,color
 
 def pen(im,tip,c):
+ global marker_count
  if tip is None:return
+ marker_count+=1
  x,y=tip;d=ImageDraw.Draw(im)
  def pt(a,b):return(x+a*.84-b*.53,y-a*.53-b*.84)
  def polygon(q,c):d.polygon([pt(a,b) for a,b in q],fill=c)
@@ -158,15 +172,16 @@ def strokes(im,paths,soft=False):
 # lower icon y=1020..1390, its labels y=1440/1540. Vertical flow suits Reels.
 textcache={}
 for i,(_,title,sub) in enumerate(beats):
- for key,text,cy,maxwidth,size in [('title',title,820+620*(i%2),800,45),('label',sub,920+620*(i%2),800,35)]:
+ for key,text,cy,maxwidth,size in [('title',title,820+620*(i%2),820,62 if v4 else 45),('label',sub,920+620*(i%2),800,37 if v4 else 35)]:
   rtl=any('\u0600'<=ch<='\u06ff' for ch in text)
   while True:
-   font=ImageFont.truetype(FA if rtl else EN,size)
+   selected=font_path(text) if v4 else FA if rtl else EN
+   font=ImageFont.truetype(selected,size)
    if font.getlength(text)<=maxwidth:break
    size-=1
   cx=540
   layer=Image.new('RGBA',(W,H));d=ImageDraw.Draw(layer)
-  d.text((cx,cy),text,font=font,anchor='mm',fill=BLUE if key=='title' else INK,direction='rtl' if rtl else 'ltr')
+  d.text((cx,cy),text,font=font,anchor='mm',fill=BLUE if key=='title' else INK,direction='rtl' if rtl else 'ltr',stroke_width=1 if v4 and key=='title' else 0)
   mask=np.array(layer.getchannel('A'));contours,_=cv2.findContours(np.uint8(mask>10)*255,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
   contours=sorted(contours,key=lambda c:float(c[:,:,0].mean()),reverse=rtl)
   paths=[([tuple(p) for p in c[:,0,:]]+[tuple(c[0,0,:])],BLUE if key=='title' else INK,3) for c in contours]
@@ -174,8 +189,8 @@ for i,(_,title,sub) in enumerate(beats):
 
 def write(im,i,key,p):
  layer,paths=textcache[i,key]
- if p>=1:im.paste(layer,(0,0),layer);return
- if p<=0:return
+ if p>=1-1e-8:im.paste(layer,(0,0),layer);return
+ if p<=1e-8:return
  # Marker traces actual glyph contours. Filled glyphs settle behind the tip.
  traced,tip,color=partial(paths,p);mask=Image.new('L',(W,H));md=ImageDraw.Draw(mask)
  for k,(pts,_,_) in enumerate(traced):
@@ -185,32 +200,50 @@ def write(im,i,key,p):
  im.paste(layer,(0,0),mask);pen(im,tip,color)
 
 def build(t):
+ global marker_count
+ marker_count=0
  page=min(12,int(t//7.2));im=paper.copy()
  for i in [page*2,page*2+1]:
   if i>=len(beats):continue
   age=t-beats[i][0]
-  if age<0:continue
+  if v4 and i%2:age-=.2  # One marker draws the connector before the lower icon.
+  if age<0 or (v4 and age<1e-7):continue
   icon=icons[i]
   # Phase 1 complete outline, phase 2 colored marker hatching, phase 3 lettering.
-  outline,tip,col=partial(icon.paths,age/1.4)
-  colored,ctip,ccol=partial(icon.colorpaths(),(age-1.4)/.65)
+  outline_end=1.3 if v4 else 1.4
+  color_end=1.8 if v4 else 2.05
+  outline,tip,col=partial(icon.paths,age/outline_end)
+  colored,ctip,ccol=partial(icon.colorpaths(),(age-outline_end)/(color_end-outline_end))
   strokes(im,colored,True);strokes(im,outline)
-  if age<1.4:pen(im,tip,INK)
-  elif age<2.05:pen(im,ctip,ccol)
-  write(im,i,'title',(age-2.05)/.9)
-  write(im,i,'label',(age-2.05)/.9)
+  if age<outline_end:pen(im,tip,INK)
+  elif age<color_end:pen(im,ctip,ccol)
+  if v4:
+   write(im,i,'title',(age-1.8)/.75)
+   write(im,i,'label',(age-2.55)/.5)
+  else:
+   write(im,i,'title',(age-2.05)/.9)
+   write(im,i,'label',(age-2.05)/.9)
  # Connect finished left and right diagram nodes with a deliberate drawn arrow.
  if t>=page*7.2+3.6:
   age=t-(page*7.2+3.6);pts=[(540,962),(540,1010)];head=[(525,990),(540,1010),(555,990)]
   paths=[(pts,INK,4),(head,INK,4)]
-  traced,tip,c=partial(paths,age/.42);strokes(im,traced)
+  traced,tip,c=partial(paths,age/(.2 if v4 else .42));strokes(im,traced)
+  if v4 and age<.2:pen(im,tip,c)
+ if v4 and marker_count>1:raise AssertionError(f'Multiple markers at {t}: {marker_count}')
+ cue=next((c for c in word_cues if c['start']<=t<c['end']),None)
+ if cue:caption(im,cue['text'])
  return im
-out=P/'out'/('diagram-v3-preview.mp4' if a.preview else 'diagram-v3.mp4')
+if a.style_still is not None:
+ im=build(a.style_still)
+ if a.sample_word:caption(im,a.sample_word)
+ path=P/'previews'/'caption-style-sample.png';im.save(path)
+ print(f'{path} (design sample only, not word timing)');raise SystemExit(0)
+out=P/'out'/(f'diagram-v{a.revision}-preview.mp4' if a.preview else f'diagram-v{a.revision}.mp4')
 cmd=['ffmpeg','-y','-v','error','-f','rawvideo','-pix_fmt','rgb24','-s',f'{W}x{H}','-r',str(FPS),'-i','-','-i',str(P/'source.mp3'),'-map','0:v','-map','1:a','-c:v','libx264','-threads','4','-preset','fast','-crf','19','-pix_fmt','yuv420p','-c:a','aac','-ar','44100','-b:a','192k','-t',str(duration),'-movflags','+faststart',str(out)]
 proc=subprocess.Popen(cmd,stdin=subprocess.PIPE)
 for f in range(math.ceil(duration*FPS)):
  t=f/FPS;im=build(t);proc.stdin.write(im.tobytes())
- if f in [20,45,68,83,165,1380]:im.save(P/'previews'/f'diagram-v3-{f}.jpg')
+ if f in [20,45,68,83,165,475,1380]:im.save(P/'previews'/f'diagram-v{a.revision}-{f}.jpg')
  if f%250==0:print(f'{t:.0f}/{duration:.3f}s',flush=True)
 proc.stdin.close()
 if proc.wait():raise SystemExit('FFmpeg failed')

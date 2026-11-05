@@ -21,7 +21,7 @@
     "paperCenter": "#ffffff",
     "paperEdge": "#f1f0ea"
   },
-  "renderer": "kinetic_render.py",
+  "renderer": "diagram_render.py --revision 4",
   "audio": "source.mp3",
   "timing_status": "awaiting_verified_alignment",
   "visual_beat_seconds": 3.6,
@@ -29,5 +29,9 @@
     "charcoal",
     "blue",
     "green"
-  ]
+  ],
+  "background": "assets/notebook-paper.png",
+  "single_marker": true,
+  "headline_size": 62,
+  "word_captions_status": "Style implemented; verified timestamps unavailable; not burned into visual revision"
 }
