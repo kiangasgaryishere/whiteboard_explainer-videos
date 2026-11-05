@@ -2,7 +2,7 @@
 
 A Persian-language English-learning explainer using the supplied narrator recording, watercolor artwork, and progressive ink-outline reveals. Vertical 1080×1920, 25 fps. No generated voice, music, or added sound effects.
 
-Latest captioned **draft**: [revision 7](my-explainer/out/diagram-v7.mp4), with alternating top/bottom marker angles, short three-word subtitle groups raised by 192 pixels, and a one-second narration delay so pictures lead. Shabnam typography and the explicit “comment ACTIVE” CTA remain. Base subtitle timing is **estimated and unverified**, not precise speech alignment.
+Latest captioned **draft**: [revision 8](my-explainer/out/diagram-v8.mp4), with two genuinely simultaneous markers, smaller phrase captions, and only a half-second narration delay for a quicker hook. Shabnam typography, notebook paper and the explicit “comment ACTIVE” CTA remain. Base subtitle timing is **estimated and unverified**, not precise speech alignment.
 
 ## Watch or download
 
@@ -104,6 +104,20 @@ Subtitles now show up to three words per box (89 groups), respecting transcript 
 The original narrator recording is delayed by exactly one second; picture starts remain unchanged. Captions receive the same delay. No source audio is trimmed or stretched: the output is therefore **94.393696 seconds**, one second longer than V6. The last picture holds for the extra second and every frame still lasts 6–8 seconds. This global picture lead supersedes the earlier mixed lead/lag offsets; source semantic boundaries are still provisional.
 
 `captions-v7.estimated.srt` and `.json` contain grouped captions in output-video time, including the +1s delay. The renderer still takes the original word-level timing file as input and performs grouping/offset itself. Do not feed the already-shifted sidecar back in as source timings. Base timing remains an estimated draft requiring review.
+
+## Revision 8 — truly simultaneous drawing and a quicker hook
+
+```bash
+python3 my-explainer/diagram_render.py --revision 8 \
+  --word-captions my-explainer/word-captions.estimated.json \
+  --allow-estimated-captions
+```
+
+Both markers now work at the same time. Nine scenes pair the upper marker's main drawing/text with the lower marker's supporting drawing/color. Four scenes divide the primary figure into upper/lower paths so both markers draw different sections of the same figure. Split-path length is checked to ensure no authored lines disappear. Keyword writing overlaps the other marker's illustration work. Small, occasional emphasis strokes vary the ending of a scene rather than repeating a full-frame reset.
+
+The renderer enforces a maximum of two markers and records actual 0/1/2-marker frame counts in `previews/diagram-v8-marker-activity.json`, so concurrency is measured, not merely permitted. Subtitle type shrinks from 68px to 58px and the background from 124px to 108px high; the raised caption position and short phrase grouping remain.
+
+The global narration delay is reduced from 1s to **0.5s**. The full original recording is preserved, giving **93.893696s** total duration. The initial silent lead is only half a second. Some picture cuts were moved toward inferred clause/pause boundaries; CONTEXT and RECOMMEND labels were reassigned to better match lesson order. These are editorial refinements against unverified anchors, not a claim of precise semantic J/L alignment. Subtitle sidecars include the same +0.5s playback offset. All 13 picture frames remain within 6–8 seconds.
 
 ## Setup
 

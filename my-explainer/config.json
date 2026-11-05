@@ -21,7 +21,7 @@
     "paperCenter": "#ffffff",
     "paperEdge": "#f1f0ea"
   },
-  "renderer": "diagram_render.py --revision 7 --word-captions word-captions.estimated.json --allow-estimated-captions",
+  "renderer": "diagram_render.py --revision 8 --word-captions word-captions.estimated.json --allow-estimated-captions",
   "audio": "source.mp3",
   "timing_status": "awaiting_verified_alignment",
   "visual_beat_seconds": "variable 6.4–7.8 second frames",
@@ -31,7 +31,7 @@
     "green"
   ],
   "background": "assets/notebook-paper.png",
-  "single_marker": true,
+  "single_marker": false,
   "headline_size": 62,
   "word_captions_status": "Complete transcript displayed with estimated, unverified timing; draft only",
   "text_policy": "one keyword band per frame; essential English examples retained",
@@ -44,6 +44,10 @@
   ],
   "caption_group_words": 3,
   "caption_center_y": 1543,
-  "audio_delay_seconds": 1.0,
-  "output_duration_seconds": 94.393696
+  "audio_delay_seconds": 0.5,
+  "output_duration_seconds": 93.893696,
+  "concurrent_markers": true,
+  "active_marker_limit": 2,
+  "caption_font_size": 58,
+  "caption_box_height": 108
 }

@@ -1,0 +1,10 @@
+{
+  "total_frames": 2348,
+  "frames_by_visible_marker_count": {
+    "0": 741,
+    "1": 323,
+    "2": 1284
+  },
+  "count_basis": "rendered frames before mux rounding",
+  "encoded_frames": 2347
+}

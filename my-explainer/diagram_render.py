@@ -12,12 +12,12 @@ W,H,FPS=1080,1920,25
 INK='#263446'; BLUE='#336cce'; GREEN='#23846e'; GOLD='#dfaa42'; RED='#d7635d'
 FA='/usr/share/fonts/truetype/noto/NotoSansArabic-Bold.ttf'; EN='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 ap=argparse.ArgumentParser();ap.add_argument('--preview',type=float)
-ap.add_argument('--revision',type=int,choices=[3,4,5,6,7],default=3)
+ap.add_argument('--revision',type=int,choices=[3,4,5,6,7,8],default=3)
 ap.add_argument('--word-captions',type=Path)
 ap.add_argument('--style-still',type=float)
 ap.add_argument('--sample-word')
 ap.add_argument('--allow-estimated-captions',action='store_true',help='Explicitly render unverified draft word timings; not a synchronization claim')
-a=ap.parse_args();v4=a.revision>=4;v5=a.revision>=5;v6=a.revision>=6;v7=a.revision==7
+a=ap.parse_args();v4=a.revision>=4;v5=a.revision>=5;v6=a.revision>=6;v7=a.revision>=7;v8=a.revision==8
 headline_font=P/'assets/fonts/Shabnam-Bold.ttf' if v6 else None
 subtitle_font=P/'assets/fonts/Shabnam-Medium.ttf' if v6 else None
 if a.sample_word and a.style_still is None:ap.error('--sample-word is for a still design sample only')
@@ -151,7 +151,29 @@ if v5:
  frames=meta['frames'];frame_starts=[f['start'] for f in frames]
  compositions=[(relocated(make(f['main'],0),430,760,1.65),relocated(make(f['support'],0),760,(1020 if i==len(frames)-1 else 1080) if v7 else 1130,.95)) for i,f in enumerate(frames)]
 
+def split_paths(paths, y):
+ upper=[];lower=[]
+ for pts,c,w in paths:
+  for a,z in zip(pts,pts[1:]):
+   if (a[1]<y<z[1]) or (z[1]<y<a[1]):
+    q=(a[0]+(z[0]-a[0])*(y-a[1])/(z[1]-a[1]),y)
+    (upper if a[1]<=y else lower).append(([a,q],c,w))
+    (upper if z[1]<=y else lower).append(([q,z],c,w))
+   else:(upper if (a[1]+z[1])/2<=y else lower).append(([a,z],c,w))
+ return upper,lower
+
+if v8:
+ split_art=[]
+ for main,support in compositions:
+  ys=[p[1] for pts,_,_ in main.paths for p in pts];cut=(min(ys)+max(ys))/2
+  split_art.append((split_paths(main.paths,cut),split_paths(main.colorpaths(),cut)))
+
 def length(pts):return sum(math.dist(a,z) for a,z in zip(pts,pts[1:]))
+if v8:
+ for (main,_),((upper,lower),_) in zip(compositions,split_art):
+  original=sum(length(pts) for pts,_,_ in main.paths)
+  divided=sum(length(pts) for pts,_,_ in upper+lower)
+  assert abs(original-divided)<1e-6, 'Split figure lost or duplicated a stroke'
 def partial(paths,p):
  if p<=0 or not paths:return [],None,INK
  budget=sum(length(q) for q,_,_ in paths)*max(0,min(1,p));result=[];tip=None;color=INK
@@ -265,6 +287,7 @@ def build(t):
  return im
 
 def build_v5(t):
+ if v8:return build_v8(t)
  global marker_count
  marker_count=0
  index=max(0,min(len(frames)-1,bisect.bisect_right(frame_starts,t)-1))
@@ -296,6 +319,51 @@ def build_v5(t):
  if cue:caption(im,cue['text'],subtitle_font,meta['caption_center_y'] if v7 else 1735)
  return im
 
+def build_v8(t):
+ global marker_count
+ marker_count=0
+ index=max(0,min(len(frames)-1,bisect.bisect_right(frame_starts,t)-1))
+ frame=frames[index];age=t-frame['start'];main,support=compositions[index]
+ im=paper.copy();active=[]
+ connector=[([(550,980),(570,1030),(620,1060)],INK,4),([(597,1057),(620,1060),(608,1040)],INK,4)]
+ def task(paths,start,end,approach,soft=False):
+  traced,tip,color=partial(paths,(age-start)/(end-start));strokes(im,traced,soft)
+  if start<=age<end and tip is not None:active.append((tip,color,approach))
+ if frame['draw_mode']=='split-primary':
+  (upper,lower),(upper_color,lower_color)=split_art[index]
+  # Each marker owns a spatially separate half of the same drawing.
+  task(upper_color,2.1,2.95,'top',True);task(lower_color,2.1,2.95,'bottom',True)
+  task(upper,0,2.0,'top');task(lower,.15,2.1,'bottom')
+  task(support.colorpaths(),4.05,4.75,'bottom',True)
+  task(support.paths,2.95,4.05,'bottom')
+  task(connector,3.0,3.3,'top');text_start=3.3
+ else:
+  # Upper marker builds the main picture while the lower builds its companion.
+  task(main.colorpaths(),2.0,2.8,'top',True);task(main.paths,0,2.0,'top')
+  task(support.colorpaths(),3.45,4.5,'bottom',True);task(support.paths,.25,3.45,'bottom')
+  task(connector,2.8,3.15,'top');text_start=3.15
+ for tip,color,approach in active:pen(im,tip,color,approach)
+ if t<meta['cta']['start']:
+  # Upper marker writes while the lower marker is still drawing/coloring below.
+  write(im,index,'title',(age-text_start)/1.2,'top')
+  if index%3==1:
+   task_line=[([(380,1405),(700,1405)],GREEN,5)]
+   traced,tip,c=partial(task_line,(age-5.15)/.5);strokes(im,traced)
+   if 5.15<=age<5.65:pen(im,tip,c,'top')
+ if index%2==0:
+  x,y=support.cx+145*support.s,support.cy-80*support.s
+  rays=[([(x,y),(x+20,y-10)],GOLD,4),([(x+5,y+20),(x+28,y+22)],GOLD,4)]
+  traced,tip,c=partial(rays,(age-5.15)/.6);strokes(im,traced)
+  if 5.15<=age<5.75:pen(im,tip,c,'bottom')
+ if marker_count>2:raise AssertionError(f'More than two markers at {t}: {marker_count}')
+ if index==len(frames)-1 and age>=2.8:
+  d=ImageDraw.Draw(im);f=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',74)
+  d.text((430,730),'ACTIVE',font=f,anchor='mm',fill=INK)
+ if t>=meta['cta']['start']:draw_cta(im)
+ cue=next((c for c in word_cues if c['start']<=t-audio_delay<c['end']),None)
+ if cue:caption(im,cue['text'],subtitle_font,meta['caption_center_y'],meta['caption_font_size'],meta['caption_half_height'])
+ return im
+
 def draw_cta(im):
  d=ImageDraw.Draw(im)
  if v7:
@@ -321,25 +389,32 @@ if a.style_still is not None:
 out=P/'out'/(f'diagram-v{a.revision}-preview.mp4' if a.preview else f'diagram-v{a.revision}.mp4')
 cmd=['ffmpeg','-y','-v','error','-f','rawvideo','-pix_fmt','rgb24','-s',f'{W}x{H}','-r',str(FPS),'-i','-','-i',str(P/'source.mp3'),'-map','0:v','-map','1:a','-c:v','libx264','-threads','4','-preset','fast','-crf','19','-pix_fmt','yuv420p','-c:a','aac','-ar','44100','-b:a','192k','-t',str(duration),'-movflags','+faststart',str(out)]
 if audio_delay:cmd=cmd[:-1]+['-af',f'adelay={round(audio_delay*1000)}:all=1']+cmd[-1:]
+if v8:cmd=cmd[:-1]+['-bf','0']+cmd[-1:]  # Exact final-picture hold without B-frame reordering.
 proc=subprocess.Popen(cmd,stdin=subprocess.PIPE)
+marker_activity={0:0,1:0,2:0}
 for f in range(math.ceil(duration*FPS)):
  t=f/FPS;im=build(t);proc.stdin.write(im.tobytes())
+ if v8:marker_activity[marker_count]+=1
  if f in [20,45,68,83,165,475,1380]:im.save(P/'previews'/f'diagram-v{a.revision}-{f}.jpg')
  if f%250==0:print(f'{t:.0f}/{duration:.3f}s',flush=True)
 proc.stdin.close()
 if proc.wait():raise SystemExit('FFmpeg failed')
 if not a.preview:
- meta=json.loads(subprocess.check_output(['ffprobe','-v','error','-select_streams','v:0','-show_entries','stream=time_base','-of','json',str(out)]))
- tn,td=map(int,meta['streams'][0]['time_base'].split('/'));last=math.ceil(duration*FPS)-1
+ meta=json.loads(subprocess.check_output(['ffprobe','-v','error','-select_streams','v:0','-show_entries','stream=time_base,nb_frames','-of','json',str(out)]))
+ # FFmpeg can round -t down to a frame; use the actual encoded picture count.
+ tn,td=map(int,meta['streams'][0]['time_base'].split('/'));last=int(meta['streams'][0]['nb_frames'])-1
  lastpts=round(last/FPS*td/tn);samples=output_samples-last*(44100//FPS)
  filt=f'setts=time_base=1/44100:pts=PTS*44100*{tn}/{td}:dts=DTS*44100*{tn}/{td}:duration=if(eq(PTS\\,{lastpts})\\,{samples}\\,{44100//FPS})'
  tmp=out.with_name(out.stem+'-timed.mp4')
  subprocess.run(['ffmpeg','-y','-v','error','-i',str(out),'-map','0','-c','copy','-bsf:v',filt,'-video_track_timescale','44100','-movflags','+faststart',str(tmp)],check=True);tmp.replace(out)
+if v8:
+ (P/'previews'/f'diagram-v8-marker-activity{"-preview" if a.preview else ""}.json').write_text(json.dumps({'total_frames':sum(marker_activity.values()),'count_basis':'rendered frames before mux rounding','encoded_frames':None if a.preview else int(meta['streams'][0]['nb_frames']),'frames_by_visible_marker_count':marker_activity},indent=2))
+ print('Marker activity:',marker_activity,flush=True)
 if v7 and word_cues and not a.preview:
  source=json.loads(a.word_captions.read_text())
  shifted=[dict(c,start=round(c['start']+audio_delay,6),end=round(c['end']+audio_delay,6)) for c in word_cues]
  suffix='estimated' if source.get('reviewed') is not True else 'reviewed'
- base=P/f'captions-v7.{suffix}'
+ base=P/f'captions-v{a.revision}.{suffix}'
  base.with_suffix(base.suffix+'.json').write_text(json.dumps({'reviewed':source.get('reviewed',False),'timing_status':source.get('timing_status','reviewed'),'source_sha256':source['source_sha256'],'audio_delay_seconds':audio_delay,'groups':shifted},ensure_ascii=False,indent=2))
  def stamp(t):
   ms=round(t*1000);return f'{ms//3600000:02}:{ms//60000%60:02}:{ms//1000%60:02},{ms%1000:03}'

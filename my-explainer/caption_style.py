@@ -87,9 +87,9 @@ def group_cues(cues, limit=3):
              'text': ' '.join(w['text'] for w in c)} for c in chunks]
 
 
-def caption(im, word, preferred=None, center_y=1735):
+def caption(im, word, preferred=None, center_y=1735, base_size=68, half_height=62):
     word = normalize(word)
-    size = 68
+    size = base_size
     while True:
         font = cached_font(font_path(word, preferred), size)
         if font.getlength(word) <= 740:
@@ -97,10 +97,10 @@ def caption(im, word, preferred=None, center_y=1735):
         size -= 1
     rtl = any('\u0600' <= c <= '\u06ff' for c in word)
     d = ImageDraw.Draw(im)
-    width = max(200, round(font.getlength(word)) + 100)
+    width = max(180 if base_size<68 else 200, round(font.getlength(word)) + (84 if base_size<68 else 100))
     cx, cy = 540, center_y
     # High contrast, compact adaptive-width background within the Reel safe area.
-    d.rounded_rectangle((cx-width/2+3, cy-62+7, cx+width/2+3, cy+62+7), radius=25, fill='#cad0d3')
-    d.rounded_rectangle((cx-width/2, cy-62, cx+width/2, cy+62), radius=25, fill='#20334c')
+    d.rounded_rectangle((cx-width/2+3, cy-half_height+7, cx+width/2+3, cy+half_height+7), radius=25, fill='#cad0d3')
+    d.rounded_rectangle((cx-width/2, cy-half_height, cx+width/2, cy+half_height), radius=25, fill='#20334c')
     d.text((cx, cy-3), word, font=font, fill='#ffffff', anchor='mm', direction='rtl' if rtl else 'ltr')
-    d.rounded_rectangle((cx-23, cy+47, cx+23, cy+51), radius=2, fill='#e8ba53')
+    d.rounded_rectangle((cx-23, cy+half_height-15, cx+23, cy+half_height-11), radius=2, fill='#e8ba53')
