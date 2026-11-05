@@ -1,4 +1,4 @@
-"""Font preflight and a one-word caption pill. Timing must be supplied explicitly."""
+"""Font preflight and readable caption pills. Timing must be supplied explicitly."""
 import hashlib
 import json
 import unicodedata
@@ -61,7 +61,33 @@ def load_cues(path, audio, duration, allow_estimated=False):
     return cues
 
 
-def caption(im, word, preferred=None):
+def group_cues(cues, limit=3):
+    """Readable short phrases without crossing transcript lines or long pauses."""
+    chunks = []
+    pending = []
+    def flush():
+        if pending:
+            chunks.append(list(pending))
+            pending.clear()
+    for cue in cues:
+        if pending and (cue.get('line') != pending[-1].get('line') or cue['start']-pending[-1]['end'] > .5):
+            flush()
+        pending.append(cue)
+        if len(pending) == limit or cue['text'].endswith(('.', '!', '?', '؟', '؛')):
+            flush()
+    flush()
+    # Avoid a dangling final word: 3+1 becomes 2+2 within the same sentence.
+    for previous, current in zip(chunks, chunks[1:]):
+        if (len(current) == 1 and len(previous) == 3
+                and current[0].get('line') == previous[-1].get('line')
+                and current[0]['start']-previous[-1]['end'] <= .5
+                and not previous[-1]['text'].endswith(('.', '!', '?', '؟', '؛'))):
+            current.insert(0, previous.pop())
+    return [{'start': c[0]['start'], 'end': c[-1]['end'],
+             'text': ' '.join(w['text'] for w in c)} for c in chunks]
+
+
+def caption(im, word, preferred=None, center_y=1735):
     word = normalize(word)
     size = 68
     while True:
@@ -72,7 +98,7 @@ def caption(im, word, preferred=None):
     rtl = any('\u0600' <= c <= '\u06ff' for c in word)
     d = ImageDraw.Draw(im)
     width = max(200, round(font.getlength(word)) + 100)
-    cx, cy = 540, 1735
+    cx, cy = 540, center_y
     # High contrast, compact adaptive-width background within the Reel safe area.
     d.rounded_rectangle((cx-width/2+3, cy-62+7, cx+width/2+3, cy+62+7), radius=25, fill='#cad0d3')
     d.rounded_rectangle((cx-width/2, cy-62, cx+width/2, cy+62), radius=25, fill='#20334c')

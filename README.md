@@ -2,7 +2,7 @@
 
 A Persian-language English-learning explainer using the supplied narrator recording, watercolor artwork, and progressive ink-outline reveals. Vertical 1080×1920, 25 fps. No generated voice, music, or added sound effects.
 
-Latest captioned **draft**: [revision 6](my-explainer/out/diagram-v6.mp4), with an explicit “comment ACTIVE” CTA, Shabnam Persian typography and one-word subtitles on a dark background. The subtitle text is complete, but its timing is **estimated and unverified**, not precise speech alignment. The image-led 6–8-second compositions, notebook paper and single marker remain.
+Latest captioned **draft**: [revision 7](my-explainer/out/diagram-v7.mp4), with alternating top/bottom marker angles, short three-word subtitle groups raised by 192 pixels, and a one-second narration delay so pictures lead. Shabnam typography and the explicit “comment ACTIVE” CTA remain. Base subtitle timing is **estimated and unverified**, not precise speech alignment.
 
 ## Watch or download
 
@@ -88,6 +88,22 @@ python3 my-explainer/diagram_render.py --revision 6 \
 **Timing limitation:** speech-model access still returned HTTP 403. Instead of withholding all subtitles, this draft displays all 238 words of the supplied transcript. Line anchors were inferred from script order and detected pauses; word durations were weighted over voiced regions. This is not ASR or forced alignment and has not been verified by listening against every word. Errors and drift remain possible. It must not be described as a final synchronized subtitle track.
 
 `word-captions.estimated.json` retains `reviewed: false` and `timing_status: estimated-draft`; normal rendering rejects it without the explicit draft flag. The `.srt` sidecar is provided for review/editing. Never mark timings reviewed merely to bypass validation. The ZIP includes the MP4, estimated timing sidecars and a status note. Original audio content, speed and duration are preserved.
+
+## Revision 7 — opposing marker angles, short phrases, picture lead
+
+```bash
+python3 my-explainer/diagram_render.py --revision 7 \
+  --word-captions my-explainer/word-captions.estimated.json \
+  --allow-estimated-captions
+```
+
+Two distinct marker bodies alternate: the pale marker approaches from the upper left, and the shorter cream marker from the lower right. Only one is active at a time. Drawing/coloring tasks and alternate keyword frames use the opposing approaches.
+
+Subtitles now show up to three words per box (89 groups), respecting transcript lines, punctuation and long pauses. Dangling final words are balanced into 2+2 groups rather than 3+1; the only single-word exception is the standalone utterance «دیدی؟». The caption center moves from y=1735 to y=1543, exactly 192px or 10% of the canvas height. Keywords and the compact CTA card move upward as well so they do not overlap subtitles. Shabnam and the paper texture are retained.
+
+The original narrator recording is delayed by exactly one second; picture starts remain unchanged. Captions receive the same delay. No source audio is trimmed or stretched: the output is therefore **94.393696 seconds**, one second longer than V6. The last picture holds for the extra second and every frame still lasts 6–8 seconds. This global picture lead supersedes the earlier mixed lead/lag offsets; source semantic boundaries are still provisional.
+
+`captions-v7.estimated.srt` and `.json` contain grouped captions in output-video time, including the +1s delay. The renderer still takes the original word-level timing file as input and performs grouping/offset itself. Do not feed the already-shifted sidecar back in as source timings. Base timing remains an estimated draft requiring review.
 
 ## Setup
 

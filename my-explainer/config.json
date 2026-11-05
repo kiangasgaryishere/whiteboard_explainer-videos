@@ -21,7 +21,7 @@
     "paperCenter": "#ffffff",
     "paperEdge": "#f1f0ea"
   },
-  "renderer": "diagram_render.py --revision 6 --word-captions word-captions.estimated.json --allow-estimated-captions",
+  "renderer": "diagram_render.py --revision 7 --word-captions word-captions.estimated.json --allow-estimated-captions",
   "audio": "source.mp3",
   "timing_status": "awaiting_verified_alignment",
   "visual_beat_seconds": "variable 6.4–7.8 second frames",
@@ -37,5 +37,13 @@
   "text_policy": "one keyword band per frame; essential English examples retained",
   "persian_headline_font": "assets/fonts/Shabnam-Bold.ttf",
   "persian_caption_font": "assets/fonts/Shabnam-Medium.ttf",
-  "cta": "کلمهٔ ACTIVE را کامنت کن"
+  "cta": "کلمهٔ ACTIVE را کامنت کن",
+  "marker_models": [
+    "upper-left pale barrel",
+    "lower-right cream barrel"
+  ],
+  "caption_group_words": 3,
+  "caption_center_y": 1543,
+  "audio_delay_seconds": 1.0,
+  "output_duration_seconds": 94.393696
 }

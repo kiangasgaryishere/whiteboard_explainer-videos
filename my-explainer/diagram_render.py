@@ -6,18 +6,18 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import cv2
-from caption_style import normalize, font_path, load_cues, caption
+from caption_style import normalize, font_path, load_cues, caption, group_cues
 P=Path(__file__).parent
 W,H,FPS=1080,1920,25
 INK='#263446'; BLUE='#336cce'; GREEN='#23846e'; GOLD='#dfaa42'; RED='#d7635d'
 FA='/usr/share/fonts/truetype/noto/NotoSansArabic-Bold.ttf'; EN='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 ap=argparse.ArgumentParser();ap.add_argument('--preview',type=float)
-ap.add_argument('--revision',type=int,choices=[3,4,5,6],default=3)
+ap.add_argument('--revision',type=int,choices=[3,4,5,6,7],default=3)
 ap.add_argument('--word-captions',type=Path)
 ap.add_argument('--style-still',type=float)
 ap.add_argument('--sample-word')
 ap.add_argument('--allow-estimated-captions',action='store_true',help='Explicitly render unverified draft word timings; not a synchronization claim')
-a=ap.parse_args();v4=a.revision>=4;v5=a.revision>=5;v6=a.revision==6
+a=ap.parse_args();v4=a.revision>=4;v5=a.revision>=5;v6=a.revision>=6;v7=a.revision==7
 headline_font=P/'assets/fonts/Shabnam-Bold.ttf' if v6 else None
 subtitle_font=P/'assets/fonts/Shabnam-Medium.ttf' if v6 else None
 if a.sample_word and a.style_still is None:ap.error('--sample-word is for a still design sample only')
@@ -28,8 +28,13 @@ if 'short_labels' in meta:
 if v5:beats=[[f['start'],f['keyword'],''] for f in meta['frames']]
 if v4:beats=[[t,normalize(title),normalize(label)] for t,title,label in beats]
 raw=subprocess.check_output(['ffmpeg','-v','error','-i',str(P/'source.mp3'),'-ar','44100','-ac','1','-f','s16le','-'])
-D=len(raw)/88200;duration=min(a.preview,D) if a.preview else D
+D=len(raw)/88200
+audio_delay=float(meta.get('audio_delay_seconds',0)) if v7 else 0
+output_samples=len(raw)//2+round(audio_delay*44100)
+output_duration=output_samples/44100
+duration=min(a.preview,output_duration) if a.preview else output_duration
 word_cues=load_cues(a.word_captions,P/'source.mp3',D,a.allow_estimated_captions) if a.word_captions else []
+if v7:word_cues=group_cues(word_cues,meta['caption_group_words'])
 if a.allow_estimated_captions:print('DRAFT caption timing enabled: not verified speech alignment.',flush=True)
 # Soft stationery grain: no stretched strips, decorative headers or slide numbers.
 rng=np.random.default_rng(47);noise=rng.normal(0,.65,(H,W,1))
@@ -144,7 +149,7 @@ def relocated(icon,cx,cy,scale):
 
 if v5:
  frames=meta['frames'];frame_starts=[f['start'] for f in frames]
- compositions=[(relocated(make(f['main'],0),430,760,1.65),relocated(make(f['support'],0),760,1130,.95)) for f in frames]
+ compositions=[(relocated(make(f['main'],0),430,760,1.65),relocated(make(f['support'],0),760,(1020 if i==len(frames)-1 else 1080) if v7 else 1130,.95)) for i,f in enumerate(frames)]
 
 def length(pts):return sum(math.dist(a,z) for a,z in zip(pts,pts[1:]))
 def partial(paths,p):
@@ -162,19 +167,23 @@ def partial(paths,p):
   if budget<=0:break
  return result,tip,color
 
-def pen(im,tip,c):
+def pen(im,tip,c,approach=None):
  global marker_count
  if tip is None:return
  marker_count+=1
  x,y=tip;d=ImageDraw.Draw(im)
- def pt(a,b):return(x+a*.84-b*.53,y-a*.53-b*.84)
+ lower=v7 and approach=='bottom'
+ def pt(a,b):
+  if lower:return(x+(a*.84+b*.53)*.78,y+(-a*.53+b*.84)*.78)
+  return(x+a*.84-b*.53,y-a*.53-b*.84)
  def polygon(q,c):d.polygon([pt(a,b) for a,b in q],fill=c)
  polygon([(-7,0),(6,0),(10,18),(-9,18)],c)
  polygon([(-9,18),(10,18),(14,40),(-12,40)],'#a7b1ba')
- polygon([(-12,40),(14,40),(14,145),(-12,145)],'#f6f6f1')
+ polygon([(-12,40),(14,40),(14,145),(-12,145)],'#fff0d0' if lower else '#f6f6f1')
  polygon([(-12,52),(14,52),(14,94),(-12,94)],c)
  polygon([(-12,128),(14,128),(14,145),(-12,145)],c)
  d.line([pt(-8,42),pt(-8,126)],fill='#b5bec7',width=2)
+ if lower:d.line([pt(-11,111),pt(13,111)],fill='#243348',width=3)
 
 def strokes(im,paths,soft=False):
  if soft:
@@ -191,7 +200,7 @@ def strokes(im,paths,soft=False):
 # lower icon y=1020..1390, its labels y=1440/1540. Vertical flow suits Reels.
 textcache={}
 for i,(_,title,sub) in enumerate(beats):
- specs=[('title',title,1460,860,72)] if v5 else [('title',title,820+620*(i%2),820,62 if v4 else 45),('label',sub,920+620*(i%2),800,37 if v4 else 35)]
+ specs=[('title',title,1340 if v7 else 1460,860,72)] if v5 else [('title',title,820+620*(i%2),820,62 if v4 else 45),('label',sub,920+620*(i%2),800,37 if v4 else 35)]
  for key,text,cy,maxwidth,size in specs:
   rtl=any('\u0600'<=ch<='\u06ff' for ch in text)
   while True:
@@ -207,7 +216,7 @@ for i,(_,title,sub) in enumerate(beats):
   paths=[([tuple(p) for p in c[:,0,:]]+[tuple(c[0,0,:])],BLUE if key=='title' else INK,3) for c in contours]
   textcache[i,key]=(layer,paths)
 
-def write(im,i,key,p):
+def write(im,i,key,p,approach=None):
  layer,paths=textcache[i,key]
  if p>=1-1e-8:im.paste(layer,(0,0),layer);return
  if p<=1e-8:return
@@ -217,7 +226,7 @@ def write(im,i,key,p):
   if k<len(traced)-1:md.polygon(pts,fill=255)
   md.line(pts,fill=255,width=8,joint='curve')
  orig=layer.getchannel('A');mask=Image.fromarray(np.minimum(np.array(orig),np.array(mask)))
- im.paste(layer,(0,0),mask);pen(im,tip,color)
+ im.paste(layer,(0,0),mask);pen(im,tip,color,approach)
 
 def build(t):
  if v5:return build_v5(t)
@@ -270,24 +279,32 @@ def build_v5(t):
  strokes(im,support_fill,True);strokes(im,support_lines)
  connector=[([(550,980),(570,1030),(620,1060)],INK,4),([(597,1057),(620,1060),(608,1040)],INK,4)]
  link,ltip,_=partial(connector,(age-2.45)/.2);strokes(im,link)
- if age<1.8:pen(im,mtip,INK)
- elif age<2.45:pen(im,mctip,mcolor)
- elif age<2.65:pen(im,ltip,INK)
- elif age<3.8:pen(im,stip,INK)
- elif age<4.35:pen(im,sctip,scolor)
- if not v6 or t<meta['cta']['start']:write(im,index,'title',(age-4.35)/.9)
+ if age<1.8:pen(im,mtip,INK,'top')
+ elif age<2.45:pen(im,mctip,mcolor,'bottom')
+ elif age<2.65:pen(im,ltip,INK,'top')
+ elif age<3.8:pen(im,stip,INK,'bottom')
+ elif age<4.35:pen(im,sctip,scolor,'bottom')
+ if not v6 or t<meta['cta']['start']:write(im,index,'title',(age-4.35)/.9,'top' if index%2==0 else 'bottom')
  if marker_count>1:raise AssertionError(f'Multiple markers at {t}: {marker_count}')
  if v6:
   if index==len(frames)-1 and age>=2.45:
    d=ImageDraw.Draw(im);f=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',74)
    d.text((430,730),'ACTIVE',font=f,anchor='mm',fill=INK)
   if t>=meta['cta']['start']:draw_cta(im)
- cue=next((c for c in word_cues if c['start']<=t<c['end']),None)
- if cue:caption(im,cue['text'],subtitle_font)
+ cue_time=t-audio_delay
+ cue=next((c for c in word_cues if c['start']<=cue_time<c['end']),None)
+ if cue:caption(im,cue['text'],subtitle_font,meta['caption_center_y'] if v7 else 1735)
  return im
 
 def draw_cta(im):
  d=ImageDraw.Draw(im)
+ if v7:
+  d.rounded_rectangle((110,1250,970,1450),radius=28,fill='#20334c',outline='#e3b85d',width=3)
+  f=ImageFont.truetype(str(headline_font),72)
+  d.text((540,1315),'کلمهٔ ACTIVE',font=f,anchor='mm',direction='rtl',fill='#f1c96f')
+  f=ImageFont.truetype(str(headline_font),54)
+  d.text((540,1400),'را کامنت کن',font=f,anchor='mm',direction='rtl',fill='#ffffff')
+  return
  d.rounded_rectangle((130,1330,950,1620),radius=30,fill='#20334c',outline='#e3b85d',width=3)
  # Three deliberate text runs keep English spelling and Persian order unambiguous.
  f=ImageFont.truetype(str(headline_font),44)
@@ -298,11 +315,12 @@ def draw_cta(im):
  d.text((540,1562),'را کامنت کن',font=f,anchor='mm',direction='rtl',fill='#ffffff')
 if a.style_still is not None:
  im=build(a.style_still)
- if a.sample_word:caption(im,a.sample_word)
+ if a.sample_word:caption(im,a.sample_word,subtitle_font,meta['caption_center_y'] if v7 else 1735)
  path=P/'previews'/(f'diagram-v{a.revision}-style.png' if v6 else 'caption-style-sample.png');im.save(path)
  print(f'{path} (design sample only, not word timing)');raise SystemExit(0)
 out=P/'out'/(f'diagram-v{a.revision}-preview.mp4' if a.preview else f'diagram-v{a.revision}.mp4')
 cmd=['ffmpeg','-y','-v','error','-f','rawvideo','-pix_fmt','rgb24','-s',f'{W}x{H}','-r',str(FPS),'-i','-','-i',str(P/'source.mp3'),'-map','0:v','-map','1:a','-c:v','libx264','-threads','4','-preset','fast','-crf','19','-pix_fmt','yuv420p','-c:a','aac','-ar','44100','-b:a','192k','-t',str(duration),'-movflags','+faststart',str(out)]
+if audio_delay:cmd=cmd[:-1]+['-af',f'adelay={round(audio_delay*1000)}:all=1']+cmd[-1:]
 proc=subprocess.Popen(cmd,stdin=subprocess.PIPE)
 for f in range(math.ceil(duration*FPS)):
  t=f/FPS;im=build(t);proc.stdin.write(im.tobytes())
@@ -313,8 +331,17 @@ if proc.wait():raise SystemExit('FFmpeg failed')
 if not a.preview:
  meta=json.loads(subprocess.check_output(['ffprobe','-v','error','-select_streams','v:0','-show_entries','stream=time_base','-of','json',str(out)]))
  tn,td=map(int,meta['streams'][0]['time_base'].split('/'));last=math.ceil(duration*FPS)-1
- lastpts=round(last/FPS*td/tn);samples=len(raw)//2-last*(44100//FPS)
+ lastpts=round(last/FPS*td/tn);samples=output_samples-last*(44100//FPS)
  filt=f'setts=time_base=1/44100:pts=PTS*44100*{tn}/{td}:dts=DTS*44100*{tn}/{td}:duration=if(eq(PTS\\,{lastpts})\\,{samples}\\,{44100//FPS})'
  tmp=out.with_name(out.stem+'-timed.mp4')
  subprocess.run(['ffmpeg','-y','-v','error','-i',str(out),'-map','0','-c','copy','-bsf:v',filt,'-video_track_timescale','44100','-movflags','+faststart',str(tmp)],check=True);tmp.replace(out)
+if v7 and word_cues and not a.preview:
+ source=json.loads(a.word_captions.read_text())
+ shifted=[dict(c,start=round(c['start']+audio_delay,6),end=round(c['end']+audio_delay,6)) for c in word_cues]
+ suffix='estimated' if source.get('reviewed') is not True else 'reviewed'
+ base=P/f'captions-v7.{suffix}'
+ base.with_suffix(base.suffix+'.json').write_text(json.dumps({'reviewed':source.get('reviewed',False),'timing_status':source.get('timing_status','reviewed'),'source_sha256':source['source_sha256'],'audio_delay_seconds':audio_delay,'groups':shifted},ensure_ascii=False,indent=2))
+ def stamp(t):
+  ms=round(t*1000);return f'{ms//3600000:02}:{ms//60000%60:02}:{ms//1000%60:02},{ms%1000:03}'
+ base.with_suffix(base.suffix+'.srt').write_text('\n\n'.join(f"{i+1}\n{stamp(c['start'])} --> {stamp(c['end'])}\n{c['text']}" for i,c in enumerate(shifted))+'\n')
 print(out,flush=True)

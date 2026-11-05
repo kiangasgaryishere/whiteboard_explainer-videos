@@ -1,0 +1,190 @@
+{
+  "revision": 7,
+  "layout": "Image-led single continuous composition per frame; one keyword band only",
+  "frames": [
+    {
+      "start": 0,
+      "end": 6.4,
+      "keyword": "لغت جدید",
+      "main": "person",
+      "support": "book",
+      "provisional_audio_reference": 1.0,
+      "visual_offset": -1.0,
+      "planned_bridge": "picture leads after global 1s audio delay",
+      "timing_status": "editorial reference only; not measured speech alignment",
+      "previous_planned_bridge": "opening"
+    },
+    {
+      "start": 6.4,
+      "end": 14.0,
+      "keyword": "معنی / تعریف / مثال",
+      "main": "dictionary",
+      "support": "notebook",
+      "provisional_audio_reference": 8.2,
+      "visual_offset": -1.8,
+      "planned_bridge": "picture leads after global 1s audio delay",
+      "timing_status": "editorial reference only; not measured speech alignment",
+      "previous_planned_bridge": "L-cut / picture leads"
+    },
+    {
+      "start": 14.0,
+      "end": 21.7,
+      "keyword": "دانستن ≠ استفاده",
+      "main": "talk",
+      "support": "question",
+      "provisional_audio_reference": 15.4,
+      "visual_offset": -1.4,
+      "planned_bridge": "picture leads after global 1s audio delay",
+      "timing_status": "editorial reference only; not measured speech alignment",
+      "previous_planned_bridge": "L-cut / picture leads"
+    },
+    {
+      "start": 21.7,
+      "end": 28.5,
+      "keyword": "PASSIVE",
+      "main": "brain",
+      "support": "lock",
+      "provisional_audio_reference": 22.6,
+      "visual_offset": -0.9,
+      "planned_bridge": "picture leads after global 1s audio delay",
+      "timing_status": "editorial reference only; not measured speech alignment",
+      "previous_planned_bridge": "J-cut / audio leads"
+    },
+    {
+      "start": 28.5,
+      "end": 35.1,
+      "keyword": "ACTIVE",
+      "main": "unlock",
+      "support": "talk",
+      "provisional_audio_reference": 29.8,
+      "visual_offset": -1.3,
+      "planned_bridge": "picture leads after global 1s audio delay",
+      "timing_status": "editorial reference only; not measured speech alignment",
+      "previous_planned_bridge": "L-cut / picture leads"
+    },
+    {
+      "start": 35.1,
+      "end": 42.7,
+      "keyword": "CONTEXT → LISTEN → USE",
+      "main": "flow",
+      "support": "light",
+      "provisional_audio_reference": 37.0,
+      "visual_offset": -1.9,
+      "planned_bridge": "picture leads after global 1s audio delay",
+      "timing_status": "editorial reference only; not measured speech alignment",
+      "previous_planned_bridge": "L-cut / picture leads"
+    },
+    {
+      "start": 42.7,
+      "end": 50.3,
+      "keyword": "RECOMMEND",
+      "main": "table",
+      "support": "waiter",
+      "provisional_audio_reference": 44.2,
+      "visual_offset": -1.5,
+      "planned_bridge": "picture leads after global 1s audio delay",
+      "timing_status": "editorial reference only; not measured speech alignment",
+      "previous_planned_bridge": "L-cut / picture leads"
+    },
+    {
+      "start": 50.3,
+      "end": 57.8,
+      "keyword": "LISTEN",
+      "main": "headphones",
+      "support": "dictionary",
+      "provisional_audio_reference": 51.4,
+      "visual_offset": -1.1,
+      "planned_bridge": "picture leads after global 1s audio delay",
+      "timing_status": "editorial reference only; not measured speech alignment",
+      "previous_planned_bridge": "L-cut / picture leads"
+    },
+    {
+      "start": 57.8,
+      "end": 64.7,
+      "keyword": "Can you recommend a dish?",
+      "main": "question",
+      "support": "person",
+      "provisional_audio_reference": 58.6,
+      "visual_offset": -0.8,
+      "planned_bridge": "picture leads after global 1s audio delay",
+      "timing_status": "editorial reference only; not measured speech alignment",
+      "previous_planned_bridge": "J-cut / audio leads"
+    },
+    {
+      "start": 64.7,
+      "end": 71.2,
+      "keyword": "I’d recommend the pasta.",
+      "main": "pasta",
+      "support": "reply",
+      "provisional_audio_reference": 65.8,
+      "visual_offset": -1.1,
+      "planned_bridge": "picture leads after global 1s audio delay",
+      "timing_status": "editorial reference only; not measured speech alignment",
+      "previous_planned_bridge": "L-cut / picture leads"
+    },
+    {
+      "start": 71.2,
+      "end": 78.8,
+      "keyword": "۱۰ لغت / هفته",
+      "main": "calendar",
+      "support": "cards",
+      "provisional_audio_reference": 73.0,
+      "visual_offset": -1.8,
+      "planned_bridge": "picture leads after global 1s audio delay",
+      "timing_status": "editorial reference only; not measured speech alignment",
+      "previous_planned_bridge": "L-cut / picture leads"
+    },
+    {
+      "start": 78.8,
+      "end": 86.6,
+      "keyword": "تمرین + اسپیکینگ",
+      "main": "worksheet",
+      "support": "talk",
+      "provisional_audio_reference": 80.2,
+      "visual_offset": -1.4,
+      "planned_bridge": "picture leads after global 1s audio delay",
+      "timing_status": "editorial reference only; not measured speech alignment",
+      "previous_planned_bridge": "L-cut / picture leads"
+    },
+    {
+      "start": 86.6,
+      "end": 94.393696,
+      "keyword": "ACTIVE",
+      "main": "bubble",
+      "support": "send",
+      "provisional_audio_reference": 87.4,
+      "visual_offset": -0.8,
+      "planned_bridge": "picture leads after global 1s audio delay",
+      "timing_status": "editorial reference only; not measured speech alignment",
+      "previous_planned_bridge": "J-cut / audio leads"
+    }
+  ],
+  "background": "assets/notebook-paper.png",
+  "marker_policy": "Two distinct marker bodies alternating, A top-left, B bottom-right; one active at a time",
+  "phase_seconds": {
+    "main_outline": 1.8,
+    "main_color": 0.65,
+    "connector": 0.2,
+    "support_outline": 1.15,
+    "support_color": 0.55,
+    "keyword": 0.9
+  },
+  "caption_status": "Up to three words per box; base word timings remain estimated and unverified; caption playback shifted 1s with the voice",
+  "synchronization": "Global 1s narration delay applied after the prior picture edit; inherited voice reference points remain provisional",
+  "audio": "Original recording retained in full, preceded by exactly 1 second of silence",
+  "font": {
+    "headline": "assets/fonts/Shabnam-Bold.ttf",
+    "subtitle": "assets/fonts/Shabnam-Medium.ttf"
+  },
+  "cta": {
+    "start": 83.73,
+    "instruction": "کلمهٔ ACTIVE را کامنت کن",
+    "timing_status": "Provisional line anchor, not verified ASR"
+  },
+  "audio_delay_seconds": 1.0,
+  "caption_group_words": 3,
+  "caption_center_y": 1543,
+  "caption_shift_pixels": -192,
+  "keyword_center_y": 1340,
+  "cta_layout": "Compact two-line card above raised subtitles"
+}
