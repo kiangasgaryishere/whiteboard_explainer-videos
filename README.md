@@ -2,7 +2,7 @@
 
 A Persian-language English-learning explainer using the supplied narrator recording, watercolor artwork, and progressive ink-outline reveals. Vertical 1080×1920, 25 fps. No generated voice, music, or added sound effects.
 
-Latest visual draft: [revision 4](my-explainer/out/diagram-v4.mp4), with notebook paper, bold headlines, repaired font glyphs and a single active marker. [Caption style sample](my-explainer/previews/caption-style-sample.png). Actual speech-aligned one-word captions are still pending; the sample is not a timed subtitle export.
+Latest visual draft: [revision 5](my-explainer/out/diagram-v5.mp4), with image-led compositions, 6–8-second holds and one keyword band per frame. Notebook paper, bold type and the single active marker are retained. Actual speech-aligned one-word captions are still pending; the [caption style sample](my-explainer/previews/caption-style-sample.png) is not a timed subtitle export.
 
 ## Watch or download
 
@@ -58,6 +58,19 @@ python3 my-explainer/diagram_render.py --revision 4 --word-captions my-explainer
 ```
 
 The timing file must contain `reviewed: true`, `source_sha256` matching `source.mp3`, and a nonempty `words` array of `{start, end, text}` entries. Each entry must be one word, inside the recording's playable duration, chronologically ordered and nonoverlapping. Unreviewed, stale or invalid timing files are rejected. No estimated timing file is supplied as if verified. Speech-model downloads remain blocked by the cloud network policy; the recording itself needs no additional voice generation.
+
+## Visual revision 5 — pictures first, fewer words, longer holds
+
+```bash
+python3 my-explainer/diagram_render.py --revision 5 --preview 14
+python3 my-explainer/diagram_render.py --revision 5
+```
+
+The 13 variable-length frames each remain for 6.4–7.8 seconds. A large primary drawing, a connector and a smaller supporting drawing form one continuous composition. All image construction/coloring finishes before the only on-board keyword band starts writing. Repeated explanations and the old 3.6-second text swaps are removed. The two English restaurant sentences remain as essential teaching examples. The notebook-paper texture, bold glyph-safe text, original recording and one active marker are preserved.
+
+`diagram_v5.json` defines the actual picture cuts, frame durations, keywords, illustration pairs and provisional audio references. Some picture cuts lead those references (planned L-cuts); others follow them (planned J-cuts). **These are editorial offsets against estimated reference points, not verified semantic speech alignment.** Narration remains continuous and unmodified; no artificial pauses or time stretching were introduced.
+
+Outputs: `my-explainer/out/diagram-v5.mp4`, `diagram-v5-preview.mp4` and `diagram-v5.zip`. Earlier versions remain available. This is the latest visual edit, not a claim that the outstanding word-caption alignment has been completed.
 
 ## Setup
 

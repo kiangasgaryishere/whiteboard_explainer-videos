@@ -1,7 +1,7 @@
 """Revision 3: complete vector drawings -> marker coloring -> written labels.
 No image tracing or raster illustration dissolve. Voice alignment is provisional.
 """
-import argparse, math, json, subprocess
+import argparse, math, json, subprocess, bisect
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
@@ -12,16 +12,17 @@ W,H,FPS=1080,1920,25
 INK='#263446'; BLUE='#336cce'; GREEN='#23846e'; GOLD='#dfaa42'; RED='#d7635d'
 FA='/usr/share/fonts/truetype/noto/NotoSansArabic-Bold.ttf'; EN='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 ap=argparse.ArgumentParser();ap.add_argument('--preview',type=float)
-ap.add_argument('--revision',type=int,choices=[3,4],default=3)
+ap.add_argument('--revision',type=int,choices=[3,4,5],default=3)
 ap.add_argument('--word-captions',type=Path)
 ap.add_argument('--style-still',type=float)
 ap.add_argument('--sample-word')
-a=ap.parse_args();v4=a.revision==4
+a=ap.parse_args();v4=a.revision>=4;v5=a.revision==5
 if a.sample_word and a.style_still is None:ap.error('--sample-word is for a still design sample only')
 edit=json.loads((P/'kinetic_edit.json').read_text()); beats=edit['beats']
 meta=json.loads((P/f'diagram_v{a.revision}.json').read_text())
 if 'short_labels' in meta:
  beats=[[t,title,label] for (t,title,_),label in zip(beats,meta['short_labels'])]
+if v5:beats=[[f['start'],f['keyword'],''] for f in meta['frames']]
 if v4:beats=[[t,normalize(title),normalize(label)] for t,title,label in beats]
 raw=subprocess.check_output(['ffmpeg','-v','error','-i',str(P/'source.mp3'),'-ar','44100','-ac','1','-f','s16le','-'])
 D=len(raw)/88200;duration=min(a.preview,D) if a.preview else D
@@ -127,6 +128,17 @@ names=['book','notebook','dictionary','bubble','cards','question','brain','lock'
 # These paths are authored explicitly; every intended line is traversed completely.
 icons=[make(n,i) for i,n in enumerate(names)]
 
+def relocated(icon,cx,cy,scale):
+ out=Icon(cx,cy,scale)
+ def transform(p):return(cx+(p[0]-icon.cx)/icon.s*scale,cy+(p[1]-icon.cy)/icon.s*scale)
+ out.paths=[([transform(p) for p in pts],c,w) for pts,c,w in icon.paths]
+ out.regions=[([transform(p) for p in pts],c) for pts,c in icon.regions]
+ return out
+
+if v5:
+ frames=meta['frames'];frame_starts=[f['start'] for f in frames]
+ compositions=[(relocated(make(f['main'],0),430,760,1.65),relocated(make(f['support'],0),760,1130,.95)) for f in frames]
+
 def length(pts):return sum(math.dist(a,z) for a,z in zip(pts,pts[1:]))
 def partial(paths,p):
  if p<=0 or not paths:return [],None,INK
@@ -172,7 +184,8 @@ def strokes(im,paths,soft=False):
 # lower icon y=1020..1390, its labels y=1440/1540. Vertical flow suits Reels.
 textcache={}
 for i,(_,title,sub) in enumerate(beats):
- for key,text,cy,maxwidth,size in [('title',title,820+620*(i%2),820,62 if v4 else 45),('label',sub,920+620*(i%2),800,37 if v4 else 35)]:
+ specs=[('title',title,1460,860,72)] if v5 else [('title',title,820+620*(i%2),820,62 if v4 else 45),('label',sub,920+620*(i%2),800,37 if v4 else 35)]
+ for key,text,cy,maxwidth,size in specs:
   rtl=any('\u0600'<=ch<='\u06ff' for ch in text)
   while True:
    selected=font_path(text) if v4 else FA if rtl else EN
@@ -200,6 +213,7 @@ def write(im,i,key,p):
  im.paste(layer,(0,0),mask);pen(im,tip,color)
 
 def build(t):
+ if v5:return build_v5(t)
  global marker_count
  marker_count=0
  page=min(12,int(t//7.2));im=paper.copy()
@@ -230,6 +244,32 @@ def build(t):
   traced,tip,c=partial(paths,age/(.2 if v4 else .42));strokes(im,traced)
   if v4 and age<.2:pen(im,tip,c)
  if v4 and marker_count>1:raise AssertionError(f'Multiple markers at {t}: {marker_count}')
+ cue=next((c for c in word_cues if c['start']<=t<c['end']),None)
+ if cue:caption(im,cue['text'])
+ return im
+
+def build_v5(t):
+ global marker_count
+ marker_count=0
+ index=max(0,min(len(frames)-1,bisect.bisect_right(frame_starts,t)-1))
+ frame=frames[index];age=t-frame['start'];main,support=compositions[index]
+ im=paper.copy()
+ # Each composition grows continuously for 4.35s before its only text arrives.
+ main_lines,mtip,_=partial(main.paths,age/1.8)
+ main_fill,mctip,mcolor=partial(main.colorpaths(),(age-1.8)/.65)
+ support_lines,stip,_=partial(support.paths,(age-2.65)/1.15)
+ support_fill,sctip,scolor=partial(support.colorpaths(),(age-3.8)/.55)
+ strokes(im,main_fill,True);strokes(im,main_lines)
+ strokes(im,support_fill,True);strokes(im,support_lines)
+ connector=[([(550,980),(570,1030),(620,1060)],INK,4),([(597,1057),(620,1060),(608,1040)],INK,4)]
+ link,ltip,_=partial(connector,(age-2.45)/.2);strokes(im,link)
+ if age<1.8:pen(im,mtip,INK)
+ elif age<2.45:pen(im,mctip,mcolor)
+ elif age<2.65:pen(im,ltip,INK)
+ elif age<3.8:pen(im,stip,INK)
+ elif age<4.35:pen(im,sctip,scolor)
+ write(im,index,'title',(age-4.35)/.9)
+ if marker_count>1:raise AssertionError(f'Multiple markers at {t}: {marker_count}')
  cue=next((c for c in word_cues if c['start']<=t<c['end']),None)
  if cue:caption(im,cue['text'])
  return im
