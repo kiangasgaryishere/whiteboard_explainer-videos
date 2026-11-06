@@ -12,7 +12,7 @@ W,H,FPS=1080,1920,25
 INK='#263446'; BLUE='#336cce'; GREEN='#23846e'; GOLD='#dfaa42'; RED='#d7635d'
 FA='/usr/share/fonts/truetype/noto/NotoSansArabic-Bold.ttf'; EN='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 ap=argparse.ArgumentParser();ap.add_argument('--preview',type=float)
-ap.add_argument('--revision',type=int,choices=[3,4,5,6,7,8,9,10,11,12],default=3)
+ap.add_argument('--revision',type=int,choices=[3,4,5,6,7,8,9,10,11,12,13],default=3)
 ap.add_argument('--word-captions',type=Path)
 ap.add_argument('--style-still',type=float)
 ap.add_argument('--sample-word')

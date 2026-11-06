@@ -21,7 +21,7 @@
     "paperCenter": "#ffffff",
     "paperEdge": "#f1f0ea"
   },
-  "renderer": "diagram_render.py --revision 12 --word-captions word-captions.estimated.json --allow-estimated-captions",
+  "renderer": "diagram_render.py --revision 13 --word-captions word-captions.estimated.json --allow-estimated-captions",
   "audio": "source.mp3",
   "timing_status": "awaiting_verified_alignment",
   "visual_beat_seconds": "variable 6.2–7.95 second frames",
@@ -54,5 +54,5 @@
   "context_inset_bbox_area_target_ratio": 0.3,
   "background_provenance": "AI reconstruction based on the user inline reference; not the original pixel file",
   "marker_duration_multiplier": 1.08,
-  "camera_motion_strength": 0.7
+  "camera_motion_strength": 0.42
 }

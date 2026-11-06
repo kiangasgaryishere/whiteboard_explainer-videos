@@ -1,0 +1,9 @@
+{
+  "sampled_camera_states": 65,
+  "amplitude_ratio_to_v12": 0.6,
+  "amplitude_ratio_to_v11": 0.42,
+  "opening_zoom_before": 1.224,
+  "opening_zoom_after": 1.1344,
+  "pen_and_scene_timing_unchanged": true,
+  "scope": "Actual camera affine matrices; caption synchronization remains estimated."
+}

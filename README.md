@@ -2,7 +2,7 @@
 
 A Persian-language English-learning explainer using the supplied narrator recording, watercolor artwork, and progressive ink-outline reveals. Vertical 1080×1920, 25 fps. No generated voice, music, or added sound effects.
 
-Latest captioned **draft**: [revision 12](my-explainer/out/diagram-v12.mp4) / [ZIP](my-explainer/out/diagram-v12.zip). Camera zoom and pan amplitudes reduced by 30% from V11. Static headings, pen speed, scene timing, narration and captions are retained. Base speech/caption timing remains **estimated and unverified**.
+Latest captioned **draft**: [revision 13](my-explainer/out/diagram-v13.mp4) / [ZIP](my-explainer/out/diagram-v13.zip). Camera movement reduced another 40% from V12 (58% below V11 overall). Static headings, pen speed, scene timing, narration and captions are retained. Base speech/caption timing remains **estimated and unverified**.
 
 ## Watch or download
 
@@ -220,3 +220,14 @@ PYTHONPATH=/workspace/whiteboard-tools python3 my-explainer/diagram_render.py --
 ```
 
 Camera validation samples actual renderer affine matrices across all 13 scenes. Caption/semantic edit timings remain inherited unverified estimates, and the cream paper remains a reconstruction of the user's inline reference.
+
+## Visual revision 13 — another 40% less camera movement
+
+V13 changes `camera_motion_strength` from 0.7 to 0.42: zoom deviation and pan translation are 60% of V12, or 42% of V11. This is a further 40% reduction, 58% less than the original V11 amplitude overall. Opening zoom changes from 1.224× to 1.1344×. Existing shot timing, easing, pen speed, static headings, audio and captions remain.
+
+```sh
+PYTHONPATH=/workspace/whiteboard-tools python3 my-explainer/diagram_render.py --revision 13 \
+  --word-captions my-explainer/word-captions.estimated.json --allow-estimated-captions
+```
+
+Camera validation samples actual renderer matrices across all 13 scenes. Caption and semantic timing remain inherited unverified estimates; cream paper remains a reconstruction of the user inline reference.
