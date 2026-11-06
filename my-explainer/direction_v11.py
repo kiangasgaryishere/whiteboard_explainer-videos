@@ -66,6 +66,11 @@ class Director(PreviousDirector):
         # a real pan/reframe, rather than merely zooming about a fixed point.
         matrix = np.array([[scale,0,540-scale*cx],
                            [0,scale,830-scale*cy]],dtype=np.float32)
+        strength = float(self.g['meta'].get('camera_motion_strength',1))
+        if not 0<=strength<=1:
+            raise ValueError('camera_motion_strength must be between 0 and 1')
+        identity = np.array([[1,0,0],[0,1,0]],dtype=np.float32)
+        matrix = identity + strength*(matrix-identity)
         return Image.fromarray(cv2.warpAffine(np.asarray(surface),matrix,surface.size,
                                               flags=cv2.INTER_CUBIC,
                                               borderMode=cv2.BORDER_CONSTANT))

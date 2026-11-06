@@ -2,7 +2,7 @@
 
 A Persian-language English-learning explainer using the supplied narrator recording, watercolor artwork, and progressive ink-outline reveals. Vertical 1080×1920, 25 fps. No generated voice, music, or added sound effects.
 
-Latest captioned **draft**: [revision 11](my-explainer/out/diagram-v11.mp4) / [ZIP](my-explainer/out/diagram-v11.zip). Instant black headings, slightly slower pen movement, a four-second notebook/blocked-speech hook and semantic camera direction. Original narration, cream paper, captions and two opposing markers remain. Base speech/caption timing is **estimated and unverified**.
+Latest captioned **draft**: [revision 12](my-explainer/out/diagram-v12.mp4) / [ZIP](my-explainer/out/diagram-v12.zip). Camera zoom and pan amplitudes reduced by 30% from V11. Static headings, pen speed, scene timing, narration and captions are retained. Base speech/caption timing remains **estimated and unverified**.
 
 ## Watch or download
 
@@ -209,3 +209,14 @@ PYTHONPATH=/workspace/whiteboard-tools python3 my-explainer/diagram_render.py --
 ```
 
 Review: `previews/diagram-v11-hook-sequence.jpg`, `diagram-v11-art-sheet.png`, direction validation and per-frame marker counts. The cream background remains an AI reconstruction of the inline user reference; exact original background pixels were unavailable. Original audio is complete with the previously requested 0.5s delay; no added music/SFX. Caption and semantic J/L timing remain inherited, unreviewed estimates.
+
+## Visual revision 12 — 30% gentler camera movement
+
+V12 sets `camera_motion_strength: 0.7`. The camera blends its affine transform 70% toward the V11 transform from the identity: both zoom deviation from 1× and horizontal/vertical translation are reduced by exactly 30%. For example, the opening zoom changes from 1.32× to 1.224×. Shot timing, easing, pen traversal speed, static black headings, English-example holds, narration delay and captions remain as in V11. Earlier versions default to strength 1 and preserve their previous camera behavior.
+
+```sh
+PYTHONPATH=/workspace/whiteboard-tools python3 my-explainer/diagram_render.py --revision 12 \
+  --word-captions my-explainer/word-captions.estimated.json --allow-estimated-captions
+```
+
+Camera validation samples actual renderer affine matrices across all 13 scenes. Caption/semantic edit timings remain inherited unverified estimates, and the cream paper remains a reconstruction of the user's inline reference.

@@ -1,0 +1,248 @@
+{
+  "revision": 12,
+  "layout": "Richer primary illustration + retained supporting illustration + approximately 30% extra contextual drawing footprint",
+  "frames": [
+    {
+      "start": 0,
+      "end": 6.9,
+      "keyword": "شناختن ≠ استفاده",
+      "main": "person",
+      "support": "book",
+      "provisional_audio_reference": 0.5,
+      "visual_offset": -0.5,
+      "planned_bridge": "picture leads inferred speech (L)",
+      "timing_status": "Reference inferred from transcript order and pauses, NOT verified speech alignment",
+      "previous_planned_bridge": "opening",
+      "draw_mode": "parallel-objects",
+      "intro": "بلدی، ولی نمی‌گی؟"
+    },
+    {
+      "start": 6.9,
+      "end": 13.7,
+      "keyword": "معنی / تعریف / مثال",
+      "main": "dictionary",
+      "support": "notebook",
+      "provisional_audio_reference": 8.017234,
+      "visual_offset": -1.117234,
+      "planned_bridge": "picture leads inferred speech (L)",
+      "timing_status": "Reference inferred from transcript order and pauses, NOT verified speech alignment",
+      "previous_planned_bridge": "L-cut / picture leads",
+      "draw_mode": "split-primary",
+      "intro": "حفظ‌کردن کافیه؟"
+    },
+    {
+      "start": 13.7,
+      "end": 21.65,
+      "keyword": "دانستن ≠ استفاده",
+      "main": "talk",
+      "support": "question",
+      "provisional_audio_reference": 13.511179,
+      "visual_offset": 0.188821,
+      "planned_bridge": "inferred speech leads picture (J)",
+      "timing_status": "Reference inferred from transcript order and pauses, NOT verified speech alignment",
+      "previous_planned_bridge": "L-cut / picture leads",
+      "draw_mode": "parallel-objects",
+      "intro": "چرا موقع حرف‌زدن گیر می‌کنی؟"
+    },
+    {
+      "start": 21.65,
+      "end": 28.8,
+      "keyword": "PASSIVE",
+      "main": "brain",
+      "support": "lock",
+      "provisional_audio_reference": 23.829478,
+      "visual_offset": -2.179478,
+      "planned_bridge": "picture leads inferred speech (L)",
+      "timing_status": "Reference inferred from transcript order and pauses, NOT verified speech alignment",
+      "previous_planned_bridge": "J-cut / audio leads",
+      "draw_mode": "split-primary",
+      "intro": "می‌شناسی، اما یادت نمیاد؟"
+    },
+    {
+      "start": 28.8,
+      "end": 35.0,
+      "keyword": "ACTIVE",
+      "main": "unlock",
+      "support": "talk",
+      "provisional_audio_reference": 32.564898,
+      "visual_offset": -3.764898,
+      "planned_bridge": "picture leads inferred speech (L)",
+      "timing_status": "Reference inferred from transcript order and pauses, NOT verified speech alignment",
+      "previous_planned_bridge": "L-cut / picture leads",
+      "draw_mode": "parallel-objects",
+      "intro": "چطور از لغت استفاده کنی؟"
+    },
+    {
+      "start": 35.0,
+      "end": 42.5,
+      "keyword": "CONTEXT → LISTEN → USE",
+      "main": "flow",
+      "support": "light",
+      "provisional_audio_reference": 39.368685,
+      "visual_offset": -4.368685,
+      "planned_bridge": "picture leads inferred speech (L)",
+      "timing_status": "Reference inferred from transcript order and pauses, NOT verified speech alignment",
+      "previous_planned_bridge": "L-cut / picture leads",
+      "draw_mode": "parallel-objects",
+      "intro": "سه قدم تا استفاده"
+    },
+    {
+      "start": 42.5,
+      "end": 50.0,
+      "keyword": "CONTEXT",
+      "main": "table",
+      "support": "waiter",
+      "provisional_audio_reference": 45.066961,
+      "visual_offset": -2.566961,
+      "planned_bridge": "picture leads inferred speech (L)",
+      "timing_status": "Reference inferred from transcript order and pauses, NOT verified speech alignment",
+      "previous_planned_bridge": "L-cut / picture leads",
+      "draw_mode": "parallel-objects",
+      "intro": "کجا ازش استفاده می‌کنی؟"
+    },
+    {
+      "start": 50.0,
+      "end": 58.0,
+      "keyword": "RECOMMEND",
+      "main": "dictionary",
+      "support": "headphones",
+      "provisional_audio_reference": 53.898549,
+      "visual_offset": -3.898549,
+      "planned_bridge": "picture leads inferred speech (L)",
+      "timing_status": "Reference inferred from transcript order and pauses, NOT verified speech alignment",
+      "previous_planned_bridge": "L-cut / picture leads",
+      "draw_mode": "parallel-objects",
+      "intro": "اول کاربردش رو بشنو"
+    },
+    {
+      "start": 58.0,
+      "end": 64.6,
+      "keyword": "RECOMMEND",
+      "main": "question",
+      "support": "person",
+      "provisional_audio_reference": 61.265714,
+      "visual_offset": -3.265714,
+      "planned_bridge": "picture leads inferred speech (L)",
+      "timing_status": "Reference inferred from transcript order and pauses, NOT verified speech alignment",
+      "previous_planned_bridge": "J-cut / audio leads",
+      "draw_mode": "parallel-objects",
+      "intro": "Can you recommend a dish?"
+    },
+    {
+      "start": 64.6,
+      "end": 71.6,
+      "keyword": "USE",
+      "main": "pasta",
+      "support": "reply",
+      "provisional_audio_reference": 66.252154,
+      "visual_offset": -1.652154,
+      "planned_bridge": "picture leads inferred speech (L)",
+      "timing_status": "Reference inferred from transcript order and pauses, NOT verified speech alignment",
+      "previous_planned_bridge": "L-cut / picture leads",
+      "draw_mode": "split-primary",
+      "intro": "I’d recommend the pasta."
+    },
+    {
+      "start": 71.6,
+      "end": 78.8,
+      "keyword": "۱۰ لغت / هفته",
+      "main": "calendar",
+      "support": "cards",
+      "provisional_audio_reference": 72.033107,
+      "visual_offset": -0.433107,
+      "planned_bridge": "picture leads inferred speech (L)",
+      "timing_status": "Reference inferred from transcript order and pauses, NOT verified speech alignment",
+      "previous_planned_bridge": "L-cut / picture leads",
+      "draw_mode": "split-primary",
+      "intro": "هر هفته، یک قدم جلوتر"
+    },
+    {
+      "start": 78.8,
+      "end": 86.4,
+      "keyword": "مثال + صدا + تمرین",
+      "main": "worksheet",
+      "support": "talk",
+      "provisional_audio_reference": 82.250028,
+      "visual_offset": -3.450028,
+      "planned_bridge": "picture leads inferred speech (L)",
+      "timing_status": "Reference inferred from transcript order and pauses, NOT verified speech alignment",
+      "previous_planned_bridge": "L-cut / picture leads",
+      "draw_mode": "parallel-objects",
+      "intro": "تمرین آماده می‌خوای؟"
+    },
+    {
+      "start": 86.4,
+      "end": 93.893696,
+      "keyword": "ACTIVE",
+      "main": "bubble",
+      "support": "send",
+      "provisional_audio_reference": 84.23,
+      "visual_offset": 2.17,
+      "planned_bridge": "inferred speech leads picture (J)",
+      "timing_status": "Reference inferred from transcript order and pauses, NOT verified speech alignment",
+      "previous_planned_bridge": "J-cut / audio leads",
+      "draw_mode": "parallel-objects",
+      "intro": "بستهٔ این هفته رو بگیر"
+    }
+  ],
+  "background": "assets/cream-paper-reference-reconstruction.png",
+  "marker_policy": "Two truly simultaneous markers, upper-left and lower-right; up to two active markers per frame",
+  "phase_seconds": {
+    "intro": [
+      0,
+      0
+    ],
+    "main_outline": [
+      0.18,
+      2.8476
+    ],
+    "support_outline": [
+      0.3744,
+      3.2796
+    ],
+    "main_color": [
+      2.8476,
+      3.8196
+    ],
+    "support_color": [
+      3.2796,
+      4.2192
+    ],
+    "keyword": [
+      4.3272,
+      5.4612
+    ]
+  },
+  "caption_status": "2–3-word phrase captions; smaller 58px type and 108px-high box; estimated base timings retained",
+  "synchronization": "Picture cuts refined using inferred clause/pause anchors; not verified speech alignment",
+  "audio": "Full original narration preceded by 0.5 seconds of silence",
+  "font": {
+    "headline": "assets/fonts/Shabnam-Bold.ttf",
+    "subtitle": "assets/fonts/Shabnam-Medium.ttf"
+  },
+  "cta": {
+    "start": 83.73,
+    "instruction": "کلمهٔ ACTIVE را کامنت کن",
+    "timing_status": "Provisional line anchor, not verified ASR"
+  },
+  "audio_delay_seconds": 0.5,
+  "caption_group_words": 3,
+  "caption_center_y": 1543,
+  "caption_shift_pixels": -192,
+  "keyword_center_y": 1340,
+  "cta_layout": "Compact two-line card above raised subtitles",
+  "caption_font_size": 58,
+  "caption_half_height": 54,
+  "art_direction": "Consistent adult learner, restrained board reframing, shaded opposing pens and evolving restaurant context.",
+  "context_area_target_ratio": 0.3,
+  "hook": "Instant black question; face/notebook/speech drawn immediately, cards hit a red speech barrier and recoil, notebook close-up → learner focus → wider reveal within four seconds.",
+  "context_area_measure": "Added inset bounding-box area / existing primary+secondary bounding-box area; target 30%, capped for safe layout. Not a painted-pixel measurement.",
+  "background_provenance": "Faithful AI reconstruction of the inline user paper reference; original attachment pixels were not exposed as a local file.",
+  "sequence_policy": "Static headline already visible; new illustration begins .18s later; optional keyword after the picture. Existing restaurant context persists.",
+  "english_examples": "Fully visible black heading from the first frame; held for the full scene; short keyword follows the picture.",
+  "headline_policy": "Fully present from first frame; black headline is not written by a marker",
+  "marker_duration_multiplier": 1.08,
+  "marker_speed_ratio_to_v10": 0.9259259259259258,
+  "camera_direction": "V11 semantic shot timing retained; zoom deviation and pan translation reduced to 70% of their previous amplitudes.",
+  "camera_motion_strength": 0.7
+}
